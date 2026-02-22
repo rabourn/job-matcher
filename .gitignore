@@ -7,6 +7,9 @@ data/scored-results.json
 job-match-report.md
 career-brief.md
 
+# Personal overrides (local company lists, custom keywords, etc.)
+data/*.local.json
+
 # Personal test data
 test/*.pdf
 

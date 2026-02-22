@@ -70,7 +70,17 @@ The plugin will ask for your CV/Resume, then either collect your Career Brief or
 
 ### Customising Target Companies
 
-The plugin ships with 12 example companies across several sectors. You'll want to customise this list for your own search — edit `data/target-companies.json` to add companies you're interested in. See [Adding a Company](#adding-a-company) below for details.
+The plugin ships with 12 example companies across several sectors. You'll want to customise this list for your own search.
+
+Create a **`data/target-companies.local.json`** file with your personal company list. The plugin checks for this file first and falls back to the default `target-companies.json` if it doesn't exist. Local files are gitignored, so your personal list stays out of version control.
+
+```bash
+# Copy the example as a starting point
+cp data/target-companies.json data/target-companies.local.json
+# Then edit data/target-companies.local.json to add your target companies
+```
+
+See [Adding a Company](#adding-a-company) below for the format.
 
 ---
 

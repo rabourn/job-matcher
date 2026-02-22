@@ -209,7 +209,7 @@ From the profile, extract:
 
 ### 3c. Select Target Companies
 
-Read `data/target-companies.json` and select companies whose sectors overlap with the candidate's target sectors. Pass this filtered list to the ATS scanner agent.
+Read the target companies list — use `data/target-companies.local.json` if it exists, otherwise fall back to `data/target-companies.json`. Select companies whose sectors overlap with the candidate's target sectors. Pass this filtered list to the ATS scanner agent.
 
 ---
 
@@ -230,7 +230,7 @@ Prompt: "Scan ATS APIs for the following candidate profile:
 - Remote only: [yes/no]
 
 Project root: [current working directory]
-Read target-companies.json, filter to the relevant sectors, then scan each company's ATS.
+Read target-companies.local.json if it exists, otherwise target-companies.json. Filter to the relevant sectors, then scan each company's ATS.
 Pipe results through normalize-jobs.py and filter-jobs.py.
 Write final results to data/ats-scan-results.json."
 ```

@@ -49,7 +49,7 @@ All scripts are in the `scripts/` directory relative to the project root. Use ab
 
 ## Execution Strategy
 
-1. **Read the target companies file** to get the list of companies and their ATS details
+1. **Read the target companies file** — use `data/target-companies.local.json` if it exists, otherwise fall back to `data/target-companies.json`
 2. **Group companies by ATS platform** for efficient scanning
 3. **For each company**, run the ATS scanner script, pipe through normalize, then filter:
    ```bash
