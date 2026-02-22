@@ -1,0 +1,459 @@
+{
+  "_comment": "Companies mapped to their ATS platform and slug. Only includes verified working slugs.",
+  "companies": [
+    {
+      "name": "Planet Labs",
+      "ats": "greenhouse",
+      "slug": "planetlabs",
+      "sectors": ["climate_agtech"],
+      "notes": "Earth observation, satellite imagery for environmental monitoring"
+    },
+    {
+      "name": "Watershed",
+      "ats": "greenhouse",
+      "slug": "watershed",
+      "sectors": ["climate_agtech"],
+      "notes": "Enterprise climate platform, carbon accounting"
+    },
+    {
+      "name": "Watershed (Ashby)",
+      "ats": "ashby",
+      "slug": "watershed",
+      "sectors": ["climate_agtech"],
+      "notes": "Duplicate check — Watershed also on Ashby with more listings"
+    },
+    {
+      "name": "ClimateAI",
+      "ats": "greenhouse",
+      "slug": "climateai",
+      "sectors": ["climate_agtech"],
+      "notes": "Climate risk AI for agriculture and supply chains"
+    },
+    {
+      "name": "One Acre Fund",
+      "ats": "greenhouse",
+      "slug": "oneacrefund",
+      "sectors": ["international_development", "climate_agtech"],
+      "notes": "Smallholder farmer support across Africa"
+    },
+    {
+      "name": "Dimagi",
+      "ats": "greenhouse",
+      "slug": "dimagi",
+      "sectors": ["international_development", "health_tech"],
+      "notes": "CommCare platform for global health and development"
+    },
+    {
+      "name": "Acumen",
+      "ats": "greenhouse",
+      "slug": "acumen",
+      "sectors": ["international_development", "finance"],
+      "notes": "Impact investing, social enterprise"
+    },
+    {
+      "name": "Code for America",
+      "ats": "greenhouse",
+      "slug": "codeforamerica",
+      "sectors": ["international_development", "design_strategy"],
+      "notes": "Civic tech, government services design"
+    },
+    {
+      "name": "Wikimedia Foundation",
+      "ats": "greenhouse",
+      "slug": "wikimedia",
+      "sectors": ["glam", "design_strategy"],
+      "notes": "Wikipedia, Wikimedia Commons, open knowledge"
+    },
+    {
+      "name": "Khan Academy",
+      "ats": "greenhouse",
+      "slug": "khanacademy",
+      "sectors": ["glam", "design_strategy"],
+      "notes": "Free education platform, learning experience design"
+    },
+    {
+      "name": "Mozilla",
+      "ats": "greenhouse",
+      "slug": "mozilla",
+      "sectors": ["glam", "design_strategy"],
+      "notes": "Open internet, Firefox, privacy-focused products"
+    },
+    {
+      "name": "IDEO",
+      "ats": "greenhouse",
+      "slug": "ideo",
+      "sectors": ["design_strategy"],
+      "notes": "Design and innovation consultancy, HCD pioneers"
+    },
+    {
+      "name": "ThoughtWorks",
+      "ats": "greenhouse",
+      "slug": "thoughtworks",
+      "sectors": ["design_strategy"],
+      "notes": "Tech consultancy with strong design practice"
+    },
+    {
+      "name": "Contentful",
+      "ats": "greenhouse",
+      "slug": "contentful",
+      "sectors": ["design_strategy", "glam"],
+      "notes": "Content platform, headless CMS"
+    },
+    {
+      "name": "Storyblok",
+      "ats": "greenhouse",
+      "slug": "storyblok",
+      "sectors": ["design_strategy"],
+      "notes": "Visual CMS, content management"
+    },
+    {
+      "name": "Stripe",
+      "ats": "greenhouse",
+      "slug": "stripe",
+      "sectors": ["finance"],
+      "notes": "Payments infrastructure"
+    },
+    {
+      "name": "Block (Square)",
+      "ats": "greenhouse",
+      "slug": "block",
+      "sectors": ["finance"],
+      "notes": "Financial services, payments, Cash App"
+    },
+    {
+      "name": "Coinbase",
+      "ats": "greenhouse",
+      "slug": "coinbase",
+      "sectors": ["finance"],
+      "notes": "Crypto exchange, digital assets"
+    },
+    {
+      "name": "Ripple",
+      "ats": "greenhouse",
+      "slug": "ripple",
+      "sectors": ["finance"],
+      "notes": "Cross-border payments, blockchain"
+    },
+    {
+      "name": "Monzo",
+      "ats": "greenhouse",
+      "slug": "monzo",
+      "sectors": ["finance"],
+      "notes": "UK digital bank, strong design culture"
+    },
+    {
+      "name": "Paystack",
+      "ats": "greenhouse",
+      "slug": "paystack",
+      "sectors": ["finance", "international_development"],
+      "notes": "African payments (Stripe subsidiary)"
+    },
+    {
+      "name": "Upstart",
+      "ats": "greenhouse",
+      "slug": "upstart",
+      "sectors": ["finance"],
+      "notes": "AI lending platform"
+    },
+    {
+      "name": "Affirm",
+      "ats": "greenhouse",
+      "slug": "affirm",
+      "sectors": ["finance"],
+      "notes": "BNPL, consumer finance"
+    },
+    {
+      "name": "Credit Karma",
+      "ats": "greenhouse",
+      "slug": "creditkarma",
+      "sectors": ["finance"],
+      "notes": "Financial health, credit monitoring"
+    },
+    {
+      "name": "Chime",
+      "ats": "greenhouse",
+      "slug": "chime",
+      "sectors": ["finance"],
+      "notes": "US neobank, financial inclusion focus"
+    },
+    {
+      "name": "Brex",
+      "ats": "greenhouse",
+      "slug": "brex",
+      "sectors": ["finance"],
+      "notes": "Corporate finance, spend management"
+    },
+    {
+      "name": "Robinhood",
+      "ats": "greenhouse",
+      "slug": "robinhood",
+      "sectors": ["finance"],
+      "notes": "Investment platform, democratizing finance"
+    },
+    {
+      "name": "Nubank",
+      "ats": "greenhouse",
+      "slug": "nubank",
+      "sectors": ["finance", "international_development"],
+      "notes": "Latin American digital bank"
+    },
+    {
+      "name": "Figma",
+      "ats": "greenhouse",
+      "slug": "figma",
+      "sectors": ["design_strategy"],
+      "notes": "Design tool, strong design org"
+    },
+    {
+      "name": "Notion",
+      "ats": "ashby",
+      "slug": "notion",
+      "sectors": ["design_strategy"],
+      "notes": "Productivity and knowledge management"
+    },
+    {
+      "name": "Linear",
+      "ats": "ashby",
+      "slug": "linear",
+      "sectors": ["design_strategy"],
+      "notes": "Project management, design-led product"
+    },
+    {
+      "name": "Ramp",
+      "ats": "ashby",
+      "slug": "ramp",
+      "sectors": ["finance"],
+      "notes": "Corporate card and spend management"
+    },
+    {
+      "name": "Deel",
+      "ats": "ashby",
+      "slug": "deel",
+      "sectors": ["international_development"],
+      "notes": "Global payroll and HR, remote work infrastructure"
+    },
+    {
+      "name": "Airbnb",
+      "ats": "greenhouse",
+      "slug": "airbnb",
+      "sectors": ["design_strategy"],
+      "notes": "Travel marketplace, legendary design culture"
+    },
+    {
+      "name": "GitLab",
+      "ats": "greenhouse",
+      "slug": "gitlab",
+      "sectors": ["design_strategy"],
+      "notes": "DevOps platform, fully remote company"
+    },
+    {
+      "name": "Twilio",
+      "ats": "greenhouse",
+      "slug": "twilio",
+      "sectors": ["design_strategy"],
+      "notes": "Communications platform, large design team"
+    },
+    {
+      "name": "Lyft",
+      "ats": "greenhouse",
+      "slug": "lyft",
+      "sectors": ["design_strategy"],
+      "notes": "Ride-sharing, mobility design"
+    },
+    {
+      "name": "Anthropic",
+      "ats": "greenhouse",
+      "slug": "anthropic",
+      "sectors": ["design_strategy"],
+      "notes": "AI safety, product design for AI interfaces"
+    },
+    {
+      "name": "BCG",
+      "ats": "greenhouse",
+      "slug": "bcg",
+      "sectors": ["design_strategy"],
+      "notes": "Management consulting with design/digital practice"
+    },
+    {
+      "name": "BitGo",
+      "ats": "greenhouse",
+      "slug": "bitgo",
+      "sectors": ["finance"],
+      "notes": "Digital asset custody, institutional crypto"
+    },
+
+    {
+      "_section": "=== HEALTH TECH (new) ==="
+    },
+    {
+      "name": "Talkspace",
+      "ats": "greenhouse",
+      "slug": "talkspace",
+      "sectors": ["health_tech"],
+      "notes": "Online therapy platform, mental health"
+    },
+    {
+      "name": "Cerebral",
+      "ats": "greenhouse",
+      "slug": "cerebral",
+      "sectors": ["health_tech"],
+      "notes": "Mental health care, telehealth"
+    },
+    {
+      "name": "Modern Health",
+      "ats": "greenhouse",
+      "slug": "modernhealth",
+      "sectors": ["health_tech"],
+      "notes": "Workplace mental health platform"
+    },
+    {
+      "name": "Omada Health",
+      "ats": "greenhouse",
+      "slug": "omadahealth",
+      "sectors": ["health_tech"],
+      "notes": "Virtual care for chronic conditions"
+    },
+    {
+      "name": "Amwell",
+      "ats": "greenhouse",
+      "slug": "amwell",
+      "sectors": ["health_tech"],
+      "notes": "Telehealth platform"
+    },
+    {
+      "name": "Zocdoc",
+      "ats": "greenhouse",
+      "slug": "zocdoc",
+      "sectors": ["health_tech", "design_strategy"],
+      "notes": "Healthcare marketplace, strong product/design org"
+    },
+    {
+      "name": "Doximity",
+      "ats": "greenhouse",
+      "slug": "doximity",
+      "sectors": ["health_tech"],
+      "notes": "Professional network for physicians"
+    },
+    {
+      "name": "Veracyte",
+      "ats": "greenhouse",
+      "slug": "veracyte",
+      "sectors": ["health_tech"],
+      "notes": "Genomic diagnostics"
+    },
+    {
+      "name": "Flatiron Health",
+      "ats": "greenhouse",
+      "slug": "flatironhealth",
+      "sectors": ["health_tech"],
+      "notes": "Oncology data platform, health tech for cancer research"
+    },
+
+    {
+      "_section": "=== GLAM / SCHOLARLY (new) ==="
+    },
+    {
+      "name": "ITHAKA / JSTOR",
+      "ats": "greenhouse",
+      "slug": "ithaka",
+      "sectors": ["glam"],
+      "notes": "JSTOR, Artstor, Portico — scholarly research platforms"
+    },
+    {
+      "name": "Smithsonian Institution",
+      "ats": "greenhouse",
+      "slug": "si",
+      "sectors": ["glam"],
+      "notes": "World's largest museum/research complex"
+    },
+    {
+      "name": "American Museum of Natural History",
+      "ats": "greenhouse",
+      "slug": "amnh",
+      "sectors": ["glam"],
+      "notes": "Major natural history museum, NYC"
+    },
+    {
+      "name": "Elsevier",
+      "ats": "greenhouse",
+      "slug": "elsevier",
+      "sectors": ["glam"],
+      "notes": "Academic publishing, research tools (ScienceDirect, Scopus)"
+    },
+
+    {
+      "_section": "=== CLIMATE / SUSTAINABILITY (new) ==="
+    },
+    {
+      "name": "Isometric",
+      "ats": "ashby",
+      "slug": "isometric",
+      "sectors": ["climate_agtech"],
+      "notes": "Carbon credit verification, climate integrity"
+    },
+    {
+      "name": "Mosaic",
+      "ats": "ashby",
+      "slug": "mosaic",
+      "sectors": ["climate_agtech"],
+      "notes": "Clean energy financing"
+    },
+    {
+      "name": "Greenpeace",
+      "ats": "greenhouse",
+      "slug": "greenpeace",
+      "sectors": ["climate_agtech", "international_development"],
+      "notes": "Environmental advocacy, global campaigns"
+    },
+
+    {
+      "_section": "=== INTERNATIONAL DEVELOPMENT / SOCIAL IMPACT (new) ==="
+    },
+    {
+      "name": "Social Finance",
+      "ats": "greenhouse",
+      "slug": "socialfinance",
+      "sectors": ["international_development", "finance"],
+      "notes": "Impact finance, social impact bonds"
+    },
+    {
+      "name": "Luminate",
+      "ats": "greenhouse",
+      "slug": "luminate",
+      "sectors": ["international_development"],
+      "notes": "Global philanthropic org (Omidyar), civic empowerment and data rights"
+    },
+    {
+      "name": "Civic Actions",
+      "ats": "greenhouse",
+      "slug": "civicactions",
+      "sectors": ["international_development", "design_strategy"],
+      "notes": "Digital services for government, civic tech"
+    },
+    {
+      "name": "Sprout Social",
+      "ats": "greenhouse",
+      "slug": "sproutsocial",
+      "sectors": ["design_strategy"],
+      "notes": "Social media management platform, strong design culture"
+    },
+
+    {
+      "_section": "=== DESIGN / TECH (new) ==="
+    },
+    {
+      "name": "Supabase",
+      "ats": "ashby",
+      "slug": "supabase",
+      "sectors": ["design_strategy"],
+      "notes": "Open source Firebase alternative, developer tools"
+    },
+    {
+      "name": "Neon",
+      "ats": "ashby",
+      "slug": "neon",
+      "sectors": ["design_strategy"],
+      "notes": "Serverless Postgres, developer tools"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "job-matcher",
+  "description": "Matches your CV/Resume and Career Brief to current job listings via ATS and job APIs. Builds a Career Brief through guided interview if you don't have one. Guarantees every returned job is genuinely open.",
+  "author": {
+    "name": "rabourn"
+  }
+}

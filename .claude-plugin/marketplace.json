@@ -1,0 +1,29 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "job-matcher",
+  "owner": {
+    "name": "rabourn"
+  },
+  "metadata": {
+    "description": "Job discovery and matching plugin for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "job-matcher",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/rabourn/job-matcher.git"
+      },
+      "description": "Matches your CV/Resume and Career Brief to current job listings via ATS and job APIs. Guarantees every returned job is genuinely open.",
+      "version": "2.0.0",
+      "author": {
+        "name": "rabourn"
+      },
+      "homepage": "https://github.com/rabourn/job-matcher",
+      "repository": "https://github.com/rabourn/job-matcher",
+      "license": "MIT",
+      "keywords": ["jobs", "career", "matching", "job-search", "ATS", "resume"],
+      "category": "productivity"
+    }
+  ]
+}

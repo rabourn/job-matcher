@@ -1,0 +1,17 @@
+# Generated results (runtime artifacts)
+data/ats-scan-results.json
+data/api-search-results.json
+data/rss-scan-results.json
+data/merged-results.json
+data/scored-results.json
+job-match-report.md
+career-brief.md
+
+# Personal test data
+test/*.pdf
+
+# macOS
+.DS_Store
+
+# Claude Code local settings
+.claude/

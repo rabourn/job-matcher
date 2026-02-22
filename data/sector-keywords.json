@@ -1,0 +1,102 @@
+{
+  "climate_agtech": {
+    "title_keywords": [
+      "product", "design", "UX", "research", "strategy", "director",
+      "head of", "principal", "lead", "manager", "climate", "sustainability",
+      "ESG", "carbon", "agriculture", "agtech", "cleantech"
+    ],
+    "description_keywords": [
+      "climate", "sustainability", "carbon", "emissions", "renewable",
+      "clean energy", "agriculture", "food systems", "environment",
+      "ESG", "impact", "net zero", "decarbonization", "conservation",
+      "biodiversity", "regenerative", "circular economy"
+    ],
+    "exclude_keywords": [
+      "intern", "internship", "PhD student", "postdoc"
+    ]
+  },
+  "international_development": {
+    "title_keywords": [
+      "product", "design", "UX", "research", "strategy", "director",
+      "head of", "principal", "lead", "manager", "digital", "innovation",
+      "program", "programme"
+    ],
+    "description_keywords": [
+      "development", "humanitarian", "global health", "USAID", "DFID",
+      "World Bank", "UNDP", "NGO", "non-profit", "nonprofit",
+      "emerging markets", "low-income", "LMIC", "mobile money",
+      "financial inclusion", "social impact", "gender", "equity",
+      "inclusive design", "last mile", "CGIAR", "agriculture"
+    ],
+    "exclude_keywords": [
+      "intern", "internship", "volunteer only"
+    ]
+  },
+  "glam": {
+    "title_keywords": [
+      "product", "design", "UX", "research", "strategy", "director",
+      "head of", "principal", "lead", "manager", "digital", "curator",
+      "collections", "archives"
+    ],
+    "description_keywords": [
+      "museum", "gallery", "library", "archive", "cultural heritage",
+      "GLAM", "collections", "digital preservation", "metadata",
+      "cataloguing", "exhibition", "public engagement", "education",
+      "Smithsonian", "JSTOR", "IIIF", "open access", "scholarly",
+      "academic", "research", "humanities", "digital humanities"
+    ],
+    "exclude_keywords": [
+      "intern", "internship", "volunteer only", "docent"
+    ]
+  },
+  "finance": {
+    "title_keywords": [
+      "product", "design", "UX", "research", "strategy", "director",
+      "head of", "principal", "lead", "manager", "fintech",
+      "digital banking", "payments"
+    ],
+    "description_keywords": [
+      "fintech", "financial services", "banking", "payments",
+      "digital banking", "neobank", "lending", "insurance", "insurtech",
+      "wealth management", "trading", "blockchain", "DeFi",
+      "financial inclusion", "mobile money", "credit", "underwriting",
+      "compliance", "regtech"
+    ],
+    "exclude_keywords": [
+      "intern", "internship", "sales only"
+    ]
+  },
+  "health_tech": {
+    "title_keywords": [
+      "product", "design", "UX", "research", "strategy", "director",
+      "head of", "principal", "lead", "manager", "health", "clinical",
+      "medical"
+    ],
+    "description_keywords": [
+      "health", "healthcare", "healthtech", "telehealth", "telemedicine",
+      "clinical", "patient", "EMR", "EHR", "medical device",
+      "digital health", "mHealth", "global health", "public health",
+      "WHO", "health systems", "diagnostics", "therapeutics"
+    ],
+    "exclude_keywords": [
+      "intern", "internship", "physician only", "nursing"
+    ]
+  },
+  "design_strategy": {
+    "title_keywords": [
+      "product", "design", "UX", "research", "strategy", "director",
+      "head of", "principal", "lead", "manager", "HCD",
+      "human-centered", "service design", "design ops"
+    ],
+    "description_keywords": [
+      "design thinking", "human-centered", "HCD", "user research",
+      "service design", "design strategy", "design ops", "DesignOps",
+      "product design", "UX research", "UX strategy", "design systems",
+      "interaction design", "information architecture", "usability",
+      "accessibility", "inclusive design", "co-design", "participatory"
+    ],
+    "exclude_keywords": [
+      "intern", "internship", "graphic design only", "visual design only"
+    ]
+  }
+}
