@@ -1,9 +1,9 @@
 {
+  "_comment": "Generic sector keyword sets for filtering job listings. Create sector-keywords.local.json to customise for your own role focus.",
   "climate_agtech": {
     "title_keywords": [
-      "product", "design", "UX", "research", "strategy", "director",
-      "head of", "principal", "lead", "manager", "climate", "sustainability",
-      "ESG", "carbon", "agriculture", "agtech", "cleantech"
+      "climate", "sustainability", "ESG", "carbon", "agriculture",
+      "agtech", "cleantech", "environment", "energy"
     ],
     "description_keywords": [
       "climate", "sustainability", "carbon", "emissions", "renewable",
@@ -17,9 +17,8 @@
   },
   "international_development": {
     "title_keywords": [
-      "product", "design", "UX", "research", "strategy", "director",
-      "head of", "principal", "lead", "manager", "digital", "innovation",
-      "program", "programme"
+      "development", "humanitarian", "program", "programme",
+      "innovation", "digital", "policy", "advocacy"
     ],
     "description_keywords": [
       "development", "humanitarian", "global health", "USAID", "DFID",
@@ -34,9 +33,8 @@
   },
   "glam": {
     "title_keywords": [
-      "product", "design", "UX", "research", "strategy", "director",
-      "head of", "principal", "lead", "manager", "digital", "curator",
-      "collections", "archives"
+      "curator", "collections", "archives", "library", "museum",
+      "digital", "preservation", "heritage"
     ],
     "description_keywords": [
       "museum", "gallery", "library", "archive", "cultural heritage",
@@ -51,9 +49,8 @@
   },
   "finance": {
     "title_keywords": [
-      "product", "design", "UX", "research", "strategy", "director",
-      "head of", "principal", "lead", "manager", "fintech",
-      "digital banking", "payments"
+      "fintech", "banking", "payments", "finance", "risk",
+      "compliance", "trading", "lending", "insurance"
     ],
     "description_keywords": [
       "fintech", "financial services", "banking", "payments",
@@ -68,9 +65,8 @@
   },
   "health_tech": {
     "title_keywords": [
-      "product", "design", "UX", "research", "strategy", "director",
-      "head of", "principal", "lead", "manager", "health", "clinical",
-      "medical"
+      "health", "clinical", "medical", "biotech", "pharma",
+      "patient", "telehealth", "genomics"
     ],
     "description_keywords": [
       "health", "healthcare", "healthtech", "telehealth", "telemedicine",
@@ -84,9 +80,8 @@
   },
   "design_strategy": {
     "title_keywords": [
-      "product", "design", "UX", "research", "strategy", "director",
-      "head of", "principal", "lead", "manager", "HCD",
-      "human-centered", "service design", "design ops"
+      "design", "UX", "product design", "service design",
+      "HCD", "design ops", "interaction", "accessibility"
     ],
     "description_keywords": [
       "design thinking", "human-centered", "HCD", "user research",

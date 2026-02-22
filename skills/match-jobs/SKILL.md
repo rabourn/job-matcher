@@ -191,7 +191,7 @@ Based on the confirmed Candidate Profile, prepare the search configuration:
 
 ### 3a. Map Profile to Sectors
 
-Map the candidate's target industries to sector keys used by the data files. Available sectors (from `data/sector-keywords.json`):
+Map the candidate's target industries to sector keys used by the data files. Use `data/sector-keywords.local.json` if it exists, otherwise fall back to `data/sector-keywords.json`. Available sectors:
 - `climate_agtech` — climate, sustainability, agriculture, cleantech
 - `international_development` — NGOs, humanitarian, global health, CGIAR
 - `glam` — galleries, libraries, archives, museums, digital humanities

@@ -210,7 +210,7 @@ job-matcher/
 │
 ├── data/
 │   ├── target-companies.json    # Example companies → ATS platform + slug
-│   ├── sector-keywords.json     # 6 sectors → keyword sets
+│   ├── sector-keywords.json     # 6 sectors → keyword sets (override with .local.json)
 │   │
 │   │  # Generated at runtime (by agents)
 │   ├── ats-scan-results.json
