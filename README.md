@@ -1,6 +1,6 @@
 # Job Matcher Plugin v2.0.0
 
-A Claude Code plugin that matches a person's CV/Resume and Career Brief to current job advertisements. Uses an **API-first architecture** — querying ATS and job APIs directly — to guarantee that every returned job is genuinely open.
+A Claude Code plugin that matches your CV/Resume and Career Brief to current job advertisements. Uses an **API-first architecture** — querying ATS and job APIs directly — to guarantee that every returned job is genuinely open.
 
 ## Why API-First?
 
@@ -70,7 +70,7 @@ The plugin will ask for your CV/Resume, then either collect your Career Brief or
 
 ### Customising Target Companies
 
-The plugin ships with 62 pre-configured companies across 6 sectors. To add your own, edit `data/target-companies.json` — see [Adding a Company](#adding-a-company) below for details.
+The plugin ships with 12 example companies across several sectors. You'll want to customise this list for your own search — edit `data/target-companies.json` to add companies you're interested in. See [Adding a Company](#adding-a-company) below for details.
 
 ---
 
@@ -199,7 +199,7 @@ job-matcher/
 │   └── deduplicate-jobs.py      # Fuzzy dedup, prefers ATS sources
 │
 ├── data/
-│   ├── target-companies.json    # 40 companies → ATS platform + slug
+│   ├── target-companies.json    # Example companies → ATS platform + slug
 │   ├── sector-keywords.json     # 6 sectors → keyword sets
 │   │
 │   │  # Generated at runtime (by agents)
@@ -241,7 +241,7 @@ All three agents use `tools: [Bash, Read, Write]` — no WebSearch/WebFetch. The
 
 | Agent | Model | Purpose | Output file |
 |-------|-------|---------|-------------|
-| `ats-scanner` | sonnet | Scan 40 target companies' ATS APIs | `data/ats-scan-results.json` |
+| `ats-scanner` | sonnet | Scan target companies' ATS APIs | `data/ats-scan-results.json` |
 | `api-searcher` | sonnet | Query 5 free job APIs | `data/api-search-results.json` |
 | `rss-scanner` | sonnet | Fetch job board RSS/Atom feeds | `data/rss-scan-results.json` |
 
@@ -346,16 +346,15 @@ Match scores (0-100) combine six weighted dimensions:
 
 ## Target Companies
 
-`data/target-companies.json` maps 62 companies to their ATS platforms. All slugs have been verified to return data.
+`data/target-companies.json` ships with 12 example companies to get you started. All slugs have been verified to return data. You should customise this list for your own job search.
 
-| Sector | Count | Examples | ATS platforms |
-|--------|-------|---------|--------------|
-| Design/Strategy | 22 | IDEO, Figma, Notion, Airbnb, Anthropic, Zocdoc, Supabase | Greenhouse, Ashby |
-| Finance | 17 | Stripe, Block, Coinbase, Monzo, Affirm, Chime, Ramp | Greenhouse, Ashby |
-| Intl Development | 11 | Dimagi, Acumen, Luminate, Greenpeace, Social Finance, Deel | Greenhouse, Ashby |
-| Health Tech | 10 | Flatiron Health, Zocdoc, Omada Health, Modern Health, Amwell | Greenhouse |
-| Climate/AgTech | 8 | Planet Labs, Watershed, ClimateAI, Isometric, Mosaic | Greenhouse, Ashby |
-| GLAM | 8 | Wikimedia, ITHAKA/JSTOR, Smithsonian, AMNH, Elsevier | Greenhouse |
+| Sector | Examples | ATS platforms |
+|--------|---------|--------------|
+| Finance | Stripe, Ramp | Greenhouse, Ashby |
+| Health Tech | Flatiron Health, Zocdoc | Greenhouse |
+| Climate/AgTech | Planet Labs, Watershed | Greenhouse, Ashby |
+| Tech/ML | Anthropic, GitLab, Notion, Figma | Greenhouse, Ashby |
+| GLAM | Wikimedia, Khan Academy | Greenhouse |
 
 ### Adding a Company
 
@@ -511,7 +510,7 @@ These require free API key registration but expand coverage:
 
 ### Expanding Target Companies
 
-The current list of 62 companies can always be expanded. To find more:
+The example list of 12 companies is just a starting point. To find more:
 
 ```bash
 # Test if a company uses Greenhouse
@@ -521,7 +520,7 @@ curl -s "https://boards-api.greenhouse.io/v1/boards/{slug}/jobs" | python3 -c "i
 curl -s "https://api.ashbyhq.com/posting-api/job-board/{slug}" | python3 -c "import json,sys; d=json.load(sys.stdin); print(len(d.get('jobs',[])))"
 ```
 
-Priority areas for expansion:
-- **Climate**: Climeworks, Heirloom, Charm Industrial (no working ATS slugs found yet — may use non-standard ATS)
-- **Development**: BRAC, Mercy Corps, IRC (large orgs with custom career portals, not on standard ATS)
-- **GLAM**: Internet Archive, DPLA, Europeana (may need WebSearch fallback)
+Tips:
+- Most tech startups and mid-size companies use Greenhouse or Ashby
+- Larger companies often use Workday or custom portals (not supported by ATS scanning, but covered by free API and WebSearch phases)
+- Non-profits and NGOs vary — some use Greenhouse, many use custom portals
