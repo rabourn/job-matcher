@@ -191,19 +191,18 @@ Based on the confirmed Candidate Profile, prepare the search configuration:
 
 ### 3a. Map Profile to Sectors
 
-Map the candidate's target industries to sector keys used by the data files. Use `data/sector-keywords.local.json` if it exists, otherwise fall back to `data/sector-keywords.json`. Available sectors:
-- `climate_agtech` — climate, sustainability, agriculture, cleantech
-- `international_development` — NGOs, humanitarian, global health, CGIAR
-- `glam` — galleries, libraries, archives, museums, digital humanities
-- `finance` — fintech, banking, payments, insurance
+Map the candidate's target industries to sector keys used by the data files. Use `data/sector-keywords.local.json` if it exists, otherwise fall back to `data/sector-keywords.json`. The default file includes these example sectors:
+- `climate_agtech` — climate, sustainability, clean energy
+- `finance` — fintech, banking, payments
 - `health_tech` — healthtech, digital health, clinical
-- `design_strategy` — design consultancies, HCD, UX, product design
+
+Users can define additional sectors (e.g. `international_development`, `glam`, `design_strategy`, `education`) in their local override file. If the candidate's target sectors don't match any defined sector keys, build keyword sets on the fly from the candidate's profile.
 
 ### 3b. Build Search Parameters
 
 From the profile, extract:
-- **Keywords**: Combine target role titles + distinctive skills + sector terms. Example: `"product,design,director,strategy,UX,research,HCD"`
-- **Seniority levels**: Map to normalised levels. Example: `"senior,director"`
+- **Keywords**: Combine target role titles + distinctive skills + sector terms. Example: `"data scientist,machine learning,ML engineer,analytics"`
+- **Seniority levels**: Map to normalised levels. Example: `"mid,senior"`
 - **Exclude keywords**: Things to filter out. Example: `"intern,internship,junior,entry level"`
 - **Remote preference**: Whether to filter for remote-only
 

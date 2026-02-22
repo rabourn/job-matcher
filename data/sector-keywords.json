@@ -1,97 +1,18 @@
 {
-  "_comment": "Generic sector keyword sets for filtering job listings. Create sector-keywords.local.json to customise for your own role focus.",
+  "_comment": "Example sector keyword sets. Create sector-keywords.local.json to add your own sectors and keywords.",
   "climate_agtech": {
-    "title_keywords": [
-      "climate", "sustainability", "ESG", "carbon", "agriculture",
-      "agtech", "cleantech", "environment", "energy"
-    ],
-    "description_keywords": [
-      "climate", "sustainability", "carbon", "emissions", "renewable",
-      "clean energy", "agriculture", "food systems", "environment",
-      "ESG", "impact", "net zero", "decarbonization", "conservation",
-      "biodiversity", "regenerative", "circular economy"
-    ],
-    "exclude_keywords": [
-      "intern", "internship", "PhD student", "postdoc"
-    ]
-  },
-  "international_development": {
-    "title_keywords": [
-      "development", "humanitarian", "program", "programme",
-      "innovation", "digital", "policy", "advocacy"
-    ],
-    "description_keywords": [
-      "development", "humanitarian", "global health", "USAID", "DFID",
-      "World Bank", "UNDP", "NGO", "non-profit", "nonprofit",
-      "emerging markets", "low-income", "LMIC", "mobile money",
-      "financial inclusion", "social impact", "gender", "equity",
-      "inclusive design", "last mile", "CGIAR", "agriculture"
-    ],
-    "exclude_keywords": [
-      "intern", "internship", "volunteer only"
-    ]
-  },
-  "glam": {
-    "title_keywords": [
-      "curator", "collections", "archives", "library", "museum",
-      "digital", "preservation", "heritage"
-    ],
-    "description_keywords": [
-      "museum", "gallery", "library", "archive", "cultural heritage",
-      "GLAM", "collections", "digital preservation", "metadata",
-      "cataloguing", "exhibition", "public engagement", "education",
-      "Smithsonian", "JSTOR", "IIIF", "open access", "scholarly",
-      "academic", "research", "humanities", "digital humanities"
-    ],
-    "exclude_keywords": [
-      "intern", "internship", "volunteer only", "docent"
-    ]
+    "title_keywords": ["climate", "sustainability", "carbon", "energy"],
+    "description_keywords": ["climate", "sustainability", "renewable", "clean energy", "net zero", "emissions"],
+    "exclude_keywords": ["intern", "internship"]
   },
   "finance": {
-    "title_keywords": [
-      "fintech", "banking", "payments", "finance", "risk",
-      "compliance", "trading", "lending", "insurance"
-    ],
-    "description_keywords": [
-      "fintech", "financial services", "banking", "payments",
-      "digital banking", "neobank", "lending", "insurance", "insurtech",
-      "wealth management", "trading", "blockchain", "DeFi",
-      "financial inclusion", "mobile money", "credit", "underwriting",
-      "compliance", "regtech"
-    ],
-    "exclude_keywords": [
-      "intern", "internship", "sales only"
-    ]
+    "title_keywords": ["fintech", "banking", "payments", "finance"],
+    "description_keywords": ["fintech", "financial services", "banking", "payments", "lending"],
+    "exclude_keywords": ["intern", "internship"]
   },
   "health_tech": {
-    "title_keywords": [
-      "health", "clinical", "medical", "biotech", "pharma",
-      "patient", "telehealth", "genomics"
-    ],
-    "description_keywords": [
-      "health", "healthcare", "healthtech", "telehealth", "telemedicine",
-      "clinical", "patient", "EMR", "EHR", "medical device",
-      "digital health", "mHealth", "global health", "public health",
-      "WHO", "health systems", "diagnostics", "therapeutics"
-    ],
-    "exclude_keywords": [
-      "intern", "internship", "physician only", "nursing"
-    ]
-  },
-  "design_strategy": {
-    "title_keywords": [
-      "design", "UX", "product design", "service design",
-      "HCD", "design ops", "interaction", "accessibility"
-    ],
-    "description_keywords": [
-      "design thinking", "human-centered", "HCD", "user research",
-      "service design", "design strategy", "design ops", "DesignOps",
-      "product design", "UX research", "UX strategy", "design systems",
-      "interaction design", "information architecture", "usability",
-      "accessibility", "inclusive design", "co-design", "participatory"
-    ],
-    "exclude_keywords": [
-      "intern", "internship", "graphic design only", "visual design only"
-    ]
+    "title_keywords": ["health", "clinical", "medical", "biotech"],
+    "description_keywords": ["healthcare", "healthtech", "telehealth", "digital health", "clinical"],
+    "exclude_keywords": ["intern", "internship"]
   }
 }

@@ -397,16 +397,13 @@ The slug is usually the company's subdomain on the ATS platform:
 
 ## Sector Keywords
 
-`data/sector-keywords.json` defines 6 sectors with keyword sets for filtering:
+`data/sector-keywords.json` ships with 3 example sectors. Add your own in `sector-keywords.local.json`.
 
 | Sector | Key title terms | Key description terms |
 |--------|----------------|----------------------|
-| `climate_agtech` | climate, sustainability, ESG, carbon, agtech | renewable, clean energy, net zero, biodiversity |
-| `international_development` | digital, innovation, program | humanitarian, USAID, CGIAR, financial inclusion |
-| `glam` | curator, collections, archives, digital | museum, library, IIIF, digital preservation |
-| `finance` | fintech, digital banking, payments | neobank, lending, DeFi, mobile money |
-| `health_tech` | health, clinical, medical | telehealth, EMR, mHealth, diagnostics |
-| `design_strategy` | HCD, service design, design ops | design thinking, UX research, inclusive design |
+| `climate_agtech` | climate, sustainability, carbon, energy | renewable, clean energy, net zero, emissions |
+| `finance` | fintech, banking, payments, finance | financial services, banking, payments, lending |
+| `health_tech` | health, clinical, medical, biotech | healthcare, healthtech, telehealth, digital health |
 
 ---
 
