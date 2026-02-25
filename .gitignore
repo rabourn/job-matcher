@@ -4,6 +4,7 @@ data/api-search-results.json
 data/rss-scan-results.json
 data/merged-results.json
 data/scored-results.json
+data/tmp-scans/
 job-match-report.md
 career-brief.md
 

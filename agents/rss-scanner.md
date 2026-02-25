@@ -74,6 +74,28 @@ All scripts are in the `scripts/` directory relative to the project root.
 
 4. **Write the combined results** to `data/rss-scan-results.json`
 
+## Pre-Fetched Mode (Claude Desktop)
+
+When the orchestrator has pre-fetched RSS feeds (because outbound HTTP is blocked in the current environment), you will be told to read from `data/tmp-scans/` instead of calling `fetch-rss.sh`. The orchestrator fetches raw XML via MCP and converts it to JSON using `parse-rss.py`, so the files are already in the same JSON format that `fetch-rss.sh` produces.
+
+**How to detect**: The orchestrator's prompt will say "RSS data has been pre-fetched" and provide the project root path.
+
+**Processing pre-fetched files**:
+```bash
+cat data/tmp-scans/rss-wwr-design.json | \
+  python3 scripts/normalize-jobs.py --source rss | \
+  python3 scripts/filter-jobs.py --keywords "KEYWORDS" --seniority "LEVELS"
+```
+
+File naming convention: `data/tmp-scans/rss-{feed-name}.json`
+- `rss-wwr-design.json`, `rss-wwr-product.json`, `rss-wwr-programming.json`
+- `rss-remotive-design.json`, `rss-remotive-product.json`
+- `rss-code4lib.json`
+
+Read the manifest at `data/tmp-scans/manifest.json` to discover which files exist. The Python pipeline is identical — only the data source changes.
+
+---
+
 ## Important Rules
 
 - RSS items have `verification_status: "UNVERIFIED"` — they will need verification by the orchestrator

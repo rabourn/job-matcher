@@ -60,6 +60,30 @@ All scripts are in the `scripts/` directory relative to the project root. Use ab
 4. **Collect all results** into a single JSON array
 5. **Write the combined results** to `data/ats-scan-results.json`
 
+## Pre-Fetched Mode (Claude Desktop)
+
+When the orchestrator has pre-fetched API data (because outbound HTTP is blocked in the current environment), you will be told to read from `data/tmp-scans/` instead of calling shell scripts. A manifest file at `data/tmp-scans/manifest.json` lists all fetched files with metadata.
+
+**How to detect**: The orchestrator's prompt will say "API data has been pre-fetched" and provide the project root path.
+
+**Processing pre-fetched files**: For each company file, pipe through the same normalize + filter pipeline:
+```bash
+cat data/tmp-scans/greenhouse-SLUG.json | \
+  python3 scripts/normalize-jobs.py --source greenhouse --company "COMPANY" | \
+  python3 scripts/filter-jobs.py --keywords "KEYWORDS" --seniority "LEVELS"
+```
+
+For Ashby:
+```bash
+cat data/tmp-scans/ashby-SLUG.json | \
+  python3 scripts/normalize-jobs.py --source ashby --company "COMPANY" | \
+  python3 scripts/filter-jobs.py --keywords "KEYWORDS" --seniority "LEVELS"
+```
+
+Read the manifest to discover which files exist and their company names. The Python pipeline is identical — only the data source changes (local file vs curl).
+
+---
+
 ## Important Rules
 
 - Run scans for ALL companies in the relevant sectors — do not skip any

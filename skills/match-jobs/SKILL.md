@@ -8,6 +8,7 @@ description: >
   recommendations, and market positioning advice.
   Uses an API-first architecture: ATS APIs (Greenhouse, Lever, Workable, Ashby)
   guarantee active listings; free job APIs and RSS feeds supplement coverage.
+  Works in Claude Code CLI, Claude Desktop, and Claude Cowork (auto-detects environment).
   Use when you want to find jobs that match your background and goals.
   Trigger phrases: "match jobs", "find jobs for me", "job search", "match my CV",
   "match my resume", "career match", "job match", "find me a role".
@@ -27,7 +28,15 @@ This skill uses an **API-first architecture** to guarantee that every job in the
 3. **RSS Feeds** (WeWorkRemotely, Code4Lib, Remotive) — Recent listings, need verification.
 4. **WebSearch** (main context only) — For niche boards without APIs (Devex, ReliefWeb, museum associations). Requires verification.
 
-Three background agents handle steps 1-3 in parallel using Bash/curl (which propagates to subagents). WebSearch runs in the main context for step 4.
+### Tri-Mode Operation
+
+The skill auto-detects one of three operating modes in Phase 3.5:
+
+- **CLI mode** (Claude Code CLI): Three background agents fetch data directly using Bash/curl scripts. This is the default when outbound HTTP works from Bash.
+- **Desktop MCP mode** (Claude Desktop): Bash outbound HTTP is blocked but the MCP fetch server is available. The main context pre-fetches all API data via the `mcp__job-matcher-fetch__fetch_url` MCP tool, saves responses to `data/tmp-scans/`, and agents process these local files.
+- **Cowork mode** (Claude Cowork): Both Bash HTTP and MCP tools are unavailable. The Cowork VM has a strict egress whitelist that blocks all job API domains. **WebSearch is the only network channel** that works because it runs on Anthropic's infrastructure outside the VM. All job discovery happens via WebSearch fan-out in the main context — no agents are launched.
+
+In CLI and Desktop MCP modes, three background agents handle processing in parallel. In Cowork mode, everything runs in the main context using WebSearch and WebFetch.
 
 ---
 
@@ -212,14 +221,130 @@ Read the target companies list — use `data/target-companies.local.json` if it 
 
 ---
 
+## Phase 3.5: Detect Environment & Pre-Fetch (Desktop Mode)
+
+Before launching agents, detect whether outbound HTTP works from Bash (CLI mode) or is blocked (Desktop mode). This determines how agents receive their data.
+
+### Mode Detection
+
+Run a quick connectivity test:
+```bash
+curl -s --max-time 5 -o /dev/null -w "%{http_code}" https://boards-api.greenhouse.io/v1/boards/test/jobs 2>/dev/null || echo "BLOCKED"
+```
+
+**Step 1 — Test curl connectivity:**
+- **If curl succeeds** (returns any HTTP status code): **CLI mode** — skip the rest of Phase 3.5 and proceed to Phase 4. Agents will fetch data directly using shell scripts.
+- **If curl fails or returns "BLOCKED"**: Continue to Step 2.
+
+**Step 2 — Test MCP tool availability:**
+- Check if `mcp__job-matcher-fetch__fetch_url` is in your available tool list.
+- **If MCP fetch tool is available**: **Desktop MCP mode** — continue with the Pre-Fetch via MCP section below, then proceed to Phase 4 (Desktop mode agent prompts).
+- **If MCP fetch tool is NOT available**: **Cowork mode** — skip the Pre-Fetch section entirely and proceed directly to Phase 4 (Cowork mode). All job discovery will use WebSearch fan-out in the main context.
+
+### Pre-Fetch via MCP (Desktop MCP Mode Only)
+
+When in Desktop mode, use the `mcp__job-matcher-fetch__fetch_url` tool to fetch all API data from the main context (MCP tools run outside the Desktop sandbox). Save responses to `data/tmp-scans/` so agents can process local files.
+
+**Step 1: Create the output directory**
+```bash
+mkdir -p data/tmp-scans
+```
+
+**Step 2: Fetch ATS data for each target company**
+
+For each company in the filtered target list (from Phase 3c):
+
+- **Greenhouse** companies: call `fetch_url` with:
+  - `url`: `https://boards-api.greenhouse.io/v1/boards/{SLUG}/jobs?content=true`
+  - `output_file`: `data/tmp-scans/greenhouse-{SLUG}.json`
+
+- **Ashby** companies: call `fetch_url` with:
+  - `url`: `https://api.ashbyhq.com/posting-api/job-board/{SLUG}`
+  - `output_file`: `data/tmp-scans/ashby-{SLUG}.json`
+
+- **Lever** companies (if any): call `fetch_url` with:
+  - `url`: `https://api.lever.co/v0/postings/{SLUG}`
+  - `output_file`: `data/tmp-scans/lever-{SLUG}.json`
+
+- **Workable** companies (if any): call `fetch_url` with:
+  - `url`: `https://apply.workable.com/api/v1/widget/accounts/{SLUG}`
+  - `method`: `POST`
+  - `body`: `{}`
+  - `headers`: `{"Content-Type": "application/json"}`
+  - `output_file`: `data/tmp-scans/workable-{SLUG}.json`
+
+**Batch fetch calls**: Make multiple `fetch_url` calls in parallel within a single tool-use turn to maximise throughput. Group 5-10 companies per turn.
+
+**Step 3: Fetch free job API data**
+
+Make these `fetch_url` calls (adjust categories/tags based on the candidate's profile):
+
+| Source | URL | Output File |
+|--------|-----|-------------|
+| Remotive (product) | `https://remotive.com/api/remote-jobs?category=product` | `data/tmp-scans/api-remotive-product.json` |
+| Remotive (design) | `https://remotive.com/api/remote-jobs?category=design` | `data/tmp-scans/api-remotive-design.json` |
+| RemoteOK (design) | `https://remoteok.com/api?tag=design` | `data/tmp-scans/api-remoteok-design.json` |
+| RemoteOK (product) | `https://remoteok.com/api?tag=product` | `data/tmp-scans/api-remoteok-product.json` |
+| Jobicy | `https://jobicy.com/api/v2/remote-jobs?count=50&tag={TAG}` | `data/tmp-scans/api-jobicy-{TAG}.json` |
+| Himalayas | `https://himalayas.app/jobs/api?limit=200` | `data/tmp-scans/api-himalayas-all.json` |
+| The Muse (pg 0) | `https://www.themuse.com/api/public/jobs?page=0&level={LEVEL}&category={CAT}` | `data/tmp-scans/api-themuse-p0.json` |
+| The Muse (pg 1) | `...?page=1&level={LEVEL}&category={CAT}` | `data/tmp-scans/api-themuse-p1.json` |
+| The Muse (pg 2) | `...?page=2&level={LEVEL}&category={CAT}` | `data/tmp-scans/api-themuse-p2.json` |
+
+Adjust the categories, tags, and levels based on the candidate's profile from Phase 3b.
+
+**Step 4: Fetch RSS feeds**
+
+For each relevant RSS feed (based on candidate's sectors), fetch the raw XML and convert to JSON:
+
+1. Call `fetch_url` with the feed URL and `output_file` set to `data/tmp-scans/rss-{name}.xml`
+2. Convert XML to JSON: `cat data/tmp-scans/rss-{name}.xml | python3 scripts/parse-rss.py --feed-url "FEED_URL" > data/tmp-scans/rss-{name}.json`
+
+RSS feeds to consider:
+| Feed | URL | Output File |
+|------|-----|-------------|
+| WWR Design | `https://weworkremotely.com/categories/remote-design-jobs.rss` | `rss-wwr-design` |
+| WWR Product | `https://weworkremotely.com/categories/remote-product-jobs.rss` | `rss-wwr-product` |
+| WWR Programming | `https://weworkremotely.com/categories/remote-programming-jobs.rss` | `rss-wwr-programming` |
+| Remotive Design | `https://remotive.com/remote-jobs/design/feed` | `rss-remotive-design` |
+| Remotive Product | `https://remotive.com/remote-jobs/product/feed` | `rss-remotive-product` |
+| Code4Lib | `https://jobs.code4lib.org/jobs.atom` | `rss-code4lib` |
+
+**Step 5: Write manifest**
+
+Write `data/tmp-scans/manifest.json` listing all fetched files:
+```json
+{
+  "mode": "prefetched",
+  "fetched_at": "ISO timestamp",
+  "ats_files": [
+    {"path": "greenhouse-stripe.json", "source": "greenhouse", "slug": "stripe", "company": "Stripe"}
+  ],
+  "api_files": [
+    {"path": "api-remotive-product.json", "source": "remotive", "params": "category=product"}
+  ],
+  "rss_files": [
+    {"path": "rss-wwr-design.json", "source": "rss", "feed_url": "https://..."}
+  ]
+}
+```
+
+---
+
 ## Phase 4: Execute Parallel Search
 
-Launch **three background agents** simultaneously using the `Task` tool, plus run WebSearch in the main context. All four search tracks run in parallel.
+The search strategy depends on the mode detected in Phase 3.5:
+
+- **CLI mode and Desktop MCP mode**: Launch three background agents (4a-4c) plus run niche WebSearch (4d). The agent prompts differ — use **CLI mode** prompts if curl works, or **Desktop MCP mode** prompts if data was pre-fetched.
+- **Cowork mode**: Skip agents entirely and proceed to section **4e. WebSearch Fan-Out**. All job discovery happens via WebSearch in the main context.
+
+### Agent-Based Search (CLI and Desktop MCP modes only)
 
 ### 4a. Launch ATS Scanner Agent
 
-Use the Task tool with `subagent_type` set to the ats-scanner agent:
+Use the Task tool with `subagent_type` set to the ats-scanner agent.
 
+**CLI mode prompt:**
 ```
 Prompt: "Scan ATS APIs for the following candidate profile:
 - Sectors: [list of sector keys]
@@ -234,10 +359,29 @@ Pipe results through normalize-jobs.py and filter-jobs.py.
 Write final results to data/ats-scan-results.json."
 ```
 
+**Desktop mode prompt** (when data was pre-fetched in Phase 3.5):
+```
+Prompt: "Process pre-fetched ATS data for the following candidate profile:
+- Keywords: [keyword string]
+- Seniority: [seniority levels]
+- Exclude: [exclude keywords]
+- Remote only: [yes/no]
+
+IMPORTANT: API data has been pre-fetched. Do NOT call curl or shell scripts to fetch data.
+Read the manifest at data/tmp-scans/manifest.json to find all ATS files.
+For each ATS file, pipe through the normalize and filter pipeline:
+  cat data/tmp-scans/{filename} | python3 scripts/normalize-jobs.py --source {source} --company 'COMPANY' | python3 scripts/filter-jobs.py --keywords 'KEYWORDS' --seniority 'LEVELS' --exclude-keywords 'EXCLUDES'
+
+Project root: [current working directory]
+Collect all results into a single JSON array.
+Write final results to data/ats-scan-results.json."
+```
+
 ### 4b. Launch API Searcher Agent
 
-Use the Task tool with `subagent_type` set to the api-searcher agent:
+Use the Task tool with `subagent_type` set to the api-searcher agent.
 
+**CLI mode prompt:**
 ```
 Prompt: "Search free job APIs for the following candidate profile:
 - Keywords: [keyword string]
@@ -251,10 +395,28 @@ Pipe results through normalize-jobs.py, filter-jobs.py, and deduplicate-jobs.py.
 Write final results to data/api-search-results.json."
 ```
 
+**Desktop mode prompt** (when data was pre-fetched in Phase 3.5):
+```
+Prompt: "Process pre-fetched job API data for the following candidate profile:
+- Keywords: [keyword string]
+- Seniority: [seniority levels]
+- Exclude: [exclude keywords]
+
+IMPORTANT: API data has been pre-fetched. Do NOT call curl or shell scripts to fetch data.
+Read the manifest at data/tmp-scans/manifest.json to find all API files.
+For each API file, pipe through the normalize and filter pipeline:
+  cat data/tmp-scans/{filename} | python3 scripts/normalize-jobs.py --source {source} | python3 scripts/filter-jobs.py --keywords 'KEYWORDS' --seniority 'LEVELS' --exclude-keywords 'EXCLUDES'
+
+Project root: [current working directory]
+Merge all results and deduplicate: cat merged.json | python3 scripts/deduplicate-jobs.py > data/api-search-results.json
+Write final results to data/api-search-results.json."
+```
+
 ### 4c. Launch RSS Scanner Agent
 
-Use the Task tool with `subagent_type` set to the rss-scanner agent:
+Use the Task tool with `subagent_type` set to the rss-scanner agent.
 
+**CLI mode prompt:**
 ```
 Prompt: "Scan RSS feeds for the following candidate profile:
 - Keywords: [keyword string]
@@ -264,6 +426,22 @@ Prompt: "Scan RSS feeds for the following candidate profile:
 Project root: [current working directory]
 Fetch relevant RSS feeds based on sectors.
 Pipe results through normalize-jobs.py and filter-jobs.py.
+Write final results to data/rss-scan-results.json."
+```
+
+**Desktop mode prompt** (when data was pre-fetched in Phase 3.5):
+```
+Prompt: "Process pre-fetched RSS data for the following candidate profile:
+- Keywords: [keyword string]
+- Seniority: [seniority levels]
+
+IMPORTANT: RSS data has been pre-fetched and converted to JSON. Do NOT call curl or fetch-rss.sh.
+Read the manifest at data/tmp-scans/manifest.json to find all RSS JSON files.
+For each RSS file, pipe through the normalize and filter pipeline:
+  cat data/tmp-scans/{filename} | python3 scripts/normalize-jobs.py --source rss | python3 scripts/filter-jobs.py --keywords 'KEYWORDS' --seniority 'LEVELS' --exclude-keywords 'EXCLUDES'
+
+Project root: [current working directory]
+Collect all results into a single JSON array.
 Write final results to data/rss-scan-results.json."
 ```
 
@@ -279,9 +457,113 @@ While agents run, use `WebSearch` directly in the main conversation for niche bo
 
 Only search niche boards relevant to the candidate's target sectors. Skip this step entirely if the candidate's profile doesn't include niche sectors.
 
+### 4e. WebSearch Fan-Out (Cowork Mode Only)
+
+In Cowork mode, agents cannot make network requests and MCP tools are unavailable. **WebSearch is the only network channel** — it runs on Anthropic's infrastructure and bypasses the VM's egress proxy entirely.
+
+Run **15-25 targeted WebSearch queries** in parallel batches. The model processes results directly — no normalise/filter scripts are needed.
+
+#### Search Strategy
+
+Design searches based on the candidate's profile from Phase 3. Run each batch in parallel (multiple WebSearch calls in a single message), then process results before the next batch.
+
+**Batch 1: ATS Board Discovery (4-8 searches, parallel)**
+
+Search target companies' Greenhouse/Ashby boards directly. These are the highest-quality results — if a job appears on an ATS board, it's guaranteed open.
+
+Group 2-3 related companies per search to maximize coverage:
+```
+site:boards.greenhouse.io/stripe OR site:boards.greenhouse.io/figma "[role keyword]" remote
+site:boards.greenhouse.io/flatironhealth OR site:boards.greenhouse.io/zocdoc "[role keyword]"
+site:jobs.ashbyhq.com/ramp OR site:jobs.ashbyhq.com/watershed "[role keyword]"
+```
+
+Select companies from the target list (Phase 3c) whose sectors match the candidate. Use the candidate's primary role keywords (e.g. "product manager", "UX designer", "data scientist").
+
+**Batch 2: Remote Job Board Discovery (4-6 searches, parallel)**
+
+Search major remote job boards. Include the current year to prefer recent listings:
+```
+site:weworkremotely.com "[role keyword]" [year]
+site:remotive.com "[role keyword]" remote [year]
+site:remoteok.com "[role keyword]" [year]
+site:himalayas.app "[role keyword]" remote [year]
+"[role keyword]" remote job [year] site:jobicy.com
+```
+
+Vary the role keywords across searches — use the candidate's primary title for some and secondary/adjacent titles for others.
+
+**Batch 3: Sector-Specific Discovery (2-4 searches, parallel)**
+
+Select searches based on the candidate's target sectors:
+
+| Sector | Search Query |
+|--------|-------------|
+| Climate/AgTech | `"[role keyword]" climate sustainability remote job [year]` |
+| Climate/AgTech | `site:climatetechlist.com "[role keyword]"` |
+| Finance/Fintech | `"[role keyword]" fintech remote job [year]` |
+| Health/HealthTech | `"[role keyword]" healthtech "digital health" remote job [year]` |
+| GLAM | `site:jobs.code4lib.org "[role keyword]"` |
+| GLAM | `"[role keyword]" museum library archive job remote [year]` |
+| Non-profit | `site:idealist.org "[role keyword]" remote` |
+| Intl Development | `site:devex.com "[role keyword]" [year]` |
+
+**Batch 4: Broad Discovery (2-3 searches, parallel)**
+
+Cast a wider net for roles that might appear outside the usual boards:
+```
+"[primary role title]" remote hiring [year] -intern -internship
+"[secondary role title]" remote job [year] apply
+"[role keyword]" "[sector term]" remote job opening [year]
+```
+
+#### Processing WebSearch Results
+
+After each batch, extract job listings from the search results. For each result:
+
+1. **Extract**: Job title, company name, URL, and any details visible in the search snippet (location, salary, posting date)
+2. **Filter**: Discard results that are clearly irrelevant (wrong role type, wrong seniority, aggregator pages without specific listings)
+3. **Track**: Keep a running list of unique jobs found (deduplicate by company + title)
+
+#### Enrichment via WebFetch (Optional but Recommended)
+
+After collecting all WebSearch results, use `WebFetch` to load the actual job posting pages for the **top 10-15 most promising results**. This provides:
+- Full job description and requirements
+- Exact location and remote policy
+- Salary range (if listed)
+- Application instructions and direct apply link
+
+For each promising result:
+```
+WebFetch URL="[job listing URL]" prompt="Extract: job title, company, location, remote policy, salary range, required skills, preferred skills, seniority level, posting date, and application URL. Return as structured data."
+```
+
+If WebFetch fails for a URL (some sites block automated fetches), keep the job with whatever information WebSearch provided and mark it as having limited detail.
+
+#### Cowork Mode Output
+
+After all batches and enrichment, compile the collected jobs into a structured list. Each job should have:
+- `title` — Job title
+- `company` — Company name
+- `url` — Direct link to the listing (prefer ATS/employer URLs over aggregator pages)
+- `source` — Where it was found (e.g. "greenhouse board", "weworkremotely", "remotive", "websearch")
+- `location` — Location or "Remote"
+- `salary` — Salary range if available, otherwise "Not listed"
+- `posted_date` — Posting date if available
+- `description_summary` — Key requirements/details from snippet or WebFetch
+- `verification_status` — "GUARANTEED" for ATS board results, "VERIFIED" for WebFetch-confirmed results, "UNVERIFIED" for snippet-only results
+
+There is no need to write intermediate JSON files in Cowork mode — proceed directly to Phase 5e (Cowork merge) with the compiled list.
+
 ---
 
 ## Phase 5: Merge, Deduplicate, and Verify
+
+Phase 5 differs by mode. In CLI and Desktop MCP modes, merge agent result files. In Cowork mode, the job list was compiled directly in Phase 4e.
+
+**Cowork mode**: Skip to **5e. Cowork Merge** below.
+
+### Agent-Based Merge (CLI and Desktop MCP modes)
 
 Once all three agents have completed:
 
@@ -316,7 +598,15 @@ json.dump(all_jobs, sys.stdout)
 ### 5c. Verify Non-Guaranteed Listings
 
 For jobs where `verification_status` is NOT "GUARANTEED":
-- Use `scripts/verify-url.sh URL` to check each listing
+
+**CLI mode:** Use `scripts/verify-url.sh URL` to check each listing via curl.
+
+**Desktop mode:** Use `mcp__job-matcher-fetch__verify_url` from the main context to check each listing. The MCP tool performs the same HEAD + GET + body scan logic as verify-url.sh. Call it for each URL that needs verification:
+- Tool: `verify_url`
+- Parameter: `url` — the job listing URL
+- Returns: `{url, status: VERIFIED|EXPIRED|UNVERIFIABLE, http_code, reason}`
+
+In both modes:
 - Mark results as VERIFIED, EXPIRED, or UNVERIFIABLE
 - Discard EXPIRED listings
 - Keep UNVERIFIABLE listings but flag them
@@ -326,6 +616,21 @@ For ATS results (GUARANTEED status), no verification is needed — include them 
 ### 5d. Final Filtered Pool
 
 After verification, you should have a pool of verified jobs. If fewer than 10, note this honestly in the report and explain why.
+
+### 5e. Cowork Merge (Cowork Mode Only)
+
+In Cowork mode, the job list was compiled directly during Phase 4e (WebSearch fan-out). No file-based merge is needed.
+
+1. **Deduplicate**: Remove duplicate entries by company name + job title (case-insensitive). When duplicates are found across sources, prefer the version with more detail (e.g. a WebFetch-enriched version over a snippet-only version).
+
+2. **Verify via WebFetch**: For jobs that were NOT found on ATS boards (i.e. not from `boards.greenhouse.io` or `jobs.ashbyhq.com`), attempt to verify they are still open:
+   - Use `WebFetch` on the listing URL with prompt: `"Is this job listing currently open for applications? Look for application buttons, closing dates, or 'position filled' notices. Return: status (open/closed/unclear), any salary info, and location details."`
+   - Mark verified listings as "VERIFIED", failed/unclear as "UNVERIFIED"
+   - If WebFetch fails entirely (blocked), keep the listing as "UNVERIFIED"
+
+3. **ATS board results** (URLs containing `boards.greenhouse.io` or `jobs.ashbyhq.com`): Mark as "GUARANTEED" — these are always open if they appear in search results.
+
+4. **Final pool**: Combine all verified + guaranteed + unverified listings. Proceed to Phase 6 for scoring.
 
 ---
 
@@ -341,6 +646,15 @@ For each verified job, calculate a **match score** (0-100) based on:
 | Work mode match | 0-15 | Remote/hybrid/onsite alignment with preferences |
 | Culture/values | 0-10 | Mission alignment, org size, signals from description |
 | Recency | 0-5 | Posted within last 30 days = full marks |
+
+### Scoring in Cowork Mode
+
+When working with WebSearch results that lack full job descriptions:
+- **Skills alignment**: Score based on title match, snippet keywords, and any details obtained via WebFetch. If no description is available, infer from the job title and company's known focus areas.
+- **Culture/values**: Use your knowledge of the company (if it's a known company from the target list) rather than relying solely on the job description.
+- **Recency**: If no posting date is visible, assume recent (WebSearch tends to surface recent results) and give partial credit (3/5).
+
+Jobs enriched via WebFetch should be scored the same as API-sourced jobs since you have full description data.
 
 ### Tier Assignment
 - **Tier 1: Strong Matches** (80-100%) — Strong fit right now
@@ -474,32 +788,38 @@ providers/platforms where possible]
 ---
 
 ## Methodology & Sources
-**Search strategy:** API-first architecture querying ATS and job APIs directly.
+**Search strategy:** [Describe the mode used]
+- CLI/Desktop MCP mode: "API-first architecture querying ATS and job APIs directly."
+- Cowork mode: "WebSearch fan-out across ATS career boards, remote job boards, and sector-specific sources."
+
 **Sources scanned:**
-- ATS APIs: [list companies scanned with count]
-- Job APIs: [list APIs queried with count]
-- RSS feeds: [list feeds fetched with count]
-- WebSearch: [list niche board searches]
+- ATS APIs/boards: [list companies scanned with count]
+- Job APIs/boards: [list APIs or job boards queried with count]
+- RSS feeds: [list feeds fetched with count, or "N/A — Cowork mode"]
+- WebSearch queries: [number of searches, key queries used]
+- WebFetch enrichment: [number of listings enriched with full details]
 
 **Verification:**
-- ✅ GUARANTEED OPEN: [N] roles from ATS APIs (active by definition)
-- ✅ VERIFIED OPEN: [N] roles verified via URL check
+- ✅ GUARANTEED OPEN: [N] roles from ATS APIs/boards (active by definition)
+- ✅ VERIFIED OPEN: [N] roles verified via URL check or WebFetch
 - ⚠️ UNVERIFIED: [N] roles where verification was not possible
 
 **Limitations:** [Any limitations — niche sectors with few API-accessible listings,
-geographic restrictions, etc.]
+geographic restrictions, etc. In Cowork mode, note that results are limited to
+what WebSearch indexes and that full job descriptions may not be available for all listings.]
 ```
 
 ---
 
 ## Important Guidelines
 
-- **ATS results are GUARANTEED open.** Jobs from Greenhouse, Lever, Workable, and Ashby APIs are active by definition. Always prefer these over web-searched results.
-- **ONLY include verified-open jobs from non-ATS sources.** Every non-ATS role must be verified via `verify-url.sh` or manual `WebFetch` check. If verification fails, either discard it or mark it prominently as **⚠️ UNVERIFIED**.
-- **Link to the employer's ATS, not aggregator pages.** ATS results already have direct URLs. For WebSearch results, always find the employer's own careers page or ATS link.
+- **ATS results are GUARANTEED open.** Jobs from Greenhouse, Lever, Workable, and Ashby APIs (or their board URLs in Cowork mode) are active by definition. Always prefer these over other sources.
+- **ONLY include verified-open jobs from non-ATS sources.** Every non-ATS role must be verified via `verify-url.sh`, `mcp__job-matcher-fetch__verify_url`, or `WebFetch` check. If verification fails, either discard it or mark it prominently as **⚠️ UNVERIFIED**.
+- **Link to the employer's ATS, not aggregator pages.** ATS results already have direct URLs. For WebSearch results, always find the employer's own careers page or ATS link. In Cowork mode, prefer `boards.greenhouse.io/slug/jobs/ID` URLs over third-party links.
 - **Be honest about match quality** — don't inflate scores. A 65% match is genuinely useful; the candidate needs accurate signals.
-- **Never fabricate listings** — every job in the report must be a real advertisement found during the search.
-- **Salary data**: Jobicy API includes salary ranges. For other sources, clearly mark estimates vs listed salaries.
+- **Never fabricate listings** — every job in the report must be a real advertisement found during the search. In Cowork mode, only include jobs that appeared in actual WebSearch results.
+- **Salary data**: Jobicy API includes salary ranges. In Cowork mode, salary data may be limited — clearly distinguish between listed salaries and estimates.
 - **Tailor advice to the individual** — generic career advice is unhelpful. Every recommendation should connect back to the candidate's specific profile and target roles.
 - **Be regionally aware** — use appropriate terminology, salary currencies, and cultural norms for the candidate's target market.
 - **If the search yields few results**, say so honestly and explain why. Suggest how to broaden the search or add more companies to `target-companies.json`. Eight verified-open roles are more valuable than twenty where half are expired.
+- **In Cowork mode, maximise WebSearch effectiveness:** Use specific `site:` operators for ATS boards. Include the current year in queries to bias toward recent listings. Vary role keywords across searches to avoid duplicate results. Use WebFetch to enrich the most promising results with full descriptions.

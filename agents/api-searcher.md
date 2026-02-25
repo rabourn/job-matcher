@@ -71,6 +71,30 @@ All scripts are in the `scripts/` directory relative to the project root.
    cat merged.json | python3 scripts/deduplicate-jobs.py > data/api-search-results.json
    ```
 
+## Pre-Fetched Mode (Claude Desktop)
+
+When the orchestrator has pre-fetched API data (because outbound HTTP is blocked in the current environment), you will be told to read from `data/tmp-scans/` instead of calling shell scripts. A manifest file at `data/tmp-scans/manifest.json` lists all fetched files.
+
+**How to detect**: The orchestrator's prompt will say "API data has been pre-fetched" and provide the project root path.
+
+**Processing pre-fetched files**: For each API result file, pipe through normalize + filter:
+```bash
+cat data/tmp-scans/api-remotive-product.json | \
+  python3 scripts/normalize-jobs.py --source remotive | \
+  python3 scripts/filter-jobs.py --keywords "KEYWORDS" --seniority "LEVELS"
+```
+
+File naming convention: `data/tmp-scans/api-{source}-{params}.json`
+- `api-remotive-product.json`, `api-remotive-design.json`
+- `api-remoteok-design.json`, `api-remoteok-product.json`
+- `api-jobicy-product-management.json`
+- `api-himalayas-all.json`
+- `api-themuse-senior-product.json`, etc.
+
+Read the manifest to discover which files exist and their source metadata. The Python pipeline is identical — only the data source changes (local file vs curl).
+
+---
+
 ## Important Rules
 
 - Search ALL five APIs — each has different listings
