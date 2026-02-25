@@ -525,20 +525,29 @@ After each batch, extract job listings from the search results. For each result:
 2. **Filter**: Discard results that are clearly irrelevant (wrong role type, wrong seniority, aggregator pages without specific listings)
 3. **Track**: Keep a running list of unique jobs found (deduplicate by company + title)
 
-#### Enrichment via WebFetch (Optional but Recommended)
+#### Enrichment via WebFetch (Required)
 
-After collecting all WebSearch results, use `WebFetch` to load the actual job posting pages for the **top 10-15 most promising results**. This provides:
+After collecting all WebSearch results, use `WebFetch` to load the actual job posting pages for **every result you plan to include in the report**. This is not optional — WebSearch snippets often lack critical details like posting dates.
+
+WebFetch provides:
+- **Posting date** (CRITICAL — discard listings older than 90 days)
 - Full job description and requirements
 - Exact location and remote policy
 - Salary range (if listed)
 - Application instructions and direct apply link
 
-For each promising result:
+For each result:
 ```
-WebFetch URL="[job listing URL]" prompt="Extract: job title, company, location, remote policy, salary range, required skills, preferred skills, seniority level, posting date, and application URL. Return as structured data."
+WebFetch URL="[job listing URL]" prompt="Extract: job title, company, location, remote policy, salary range, required skills, preferred skills, seniority level, and application URL. IMPORTANT: Find the exact posting date, publication date, or 'created' date on the page. Return the date exactly as shown. If no date is visible, state 'no date found'. Return as structured data."
 ```
 
-If WebFetch fails for a URL (some sites block automated fetches), keep the job with whatever information WebSearch provided and mark it as having limited detail.
+**Date validation**: After WebFetch, check every listing's posting date:
+- **Discard** any listing posted more than 90 days ago — it is almost certainly expired
+- **Flag as stale** any listing posted 60-90 days ago
+- **Keep** listings posted within the last 60 days, or where no date is found (but mark as "date unknown")
+- **NEVER assume a listing is recent just because WebSearch returned it** — some job boards (especially Code4Lib, Idealist, niche boards) keep old listings indefinitely
+
+If WebFetch fails for a URL (some sites block automated fetches), keep the job with whatever information WebSearch provided and mark it as having limited detail and unverified date.
 
 #### Cowork Mode Output
 
@@ -623,14 +632,17 @@ In Cowork mode, the job list was compiled directly during Phase 4e (WebSearch fa
 
 1. **Deduplicate**: Remove duplicate entries by company name + job title (case-insensitive). When duplicates are found across sources, prefer the version with more detail (e.g. a WebFetch-enriched version over a snippet-only version).
 
-2. **Verify via WebFetch**: For jobs that were NOT found on ATS boards (i.e. not from `boards.greenhouse.io` or `jobs.ashbyhq.com`), attempt to verify they are still open:
-   - Use `WebFetch` on the listing URL with prompt: `"Is this job listing currently open for applications? Look for application buttons, closing dates, or 'position filled' notices. Return: status (open/closed/unclear), any salary info, and location details."`
-   - Mark verified listings as "VERIFIED", failed/unclear as "UNVERIFIED"
+2. **Discard stale listings**: Any listing with a posting date older than 90 days MUST be discarded. WebSearch does not filter by date — it returns results by relevance, so years-old listings from boards like Code4Lib or Idealist will appear alongside fresh ones. If a listing has no date and was not enriched via WebFetch, it should have been enriched in Phase 4e — go back and WebFetch it before including it.
+
+3. **Verify via WebFetch**: For jobs that were NOT found on ATS boards (i.e. not from `boards.greenhouse.io` or `jobs.ashbyhq.com`), verify they are still open:
+   - Use `WebFetch` on the listing URL with prompt: `"Is this job listing currently open for applications? Find the exact posting/publication date. Look for application buttons, closing dates, or 'position filled' notices. Return: posting date (exact, as shown on page), status (open/closed/unclear), any salary info, and location details."`
+   - **Discard** listings where the posting date is older than 90 days
+   - Mark recent verified listings as "VERIFIED", failed/unclear as "UNVERIFIED"
    - If WebFetch fails entirely (blocked), keep the listing as "UNVERIFIED"
 
-3. **ATS board results** (URLs containing `boards.greenhouse.io` or `jobs.ashbyhq.com`): Mark as "GUARANTEED" — these are always open if they appear in search results.
+4. **ATS board results** (URLs containing `boards.greenhouse.io` or `jobs.ashbyhq.com`): Mark as "GUARANTEED" — these are always open if they appear in search results.
 
-4. **Final pool**: Combine all verified + guaranteed + unverified listings. Proceed to Phase 6 for scoring.
+5. **Final pool**: Combine all verified + guaranteed + unverified listings. Proceed to Phase 6 for scoring.
 
 ---
 
