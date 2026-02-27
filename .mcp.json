@@ -2,7 +2,7 @@
   "mcpServers": {
     "job-matcher-fetch": {
       "command": "node",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/mcp-fetch-server.mjs"]
+      "args": ["scripts/mcp-fetch-server.mjs"]
     }
   }
 }
