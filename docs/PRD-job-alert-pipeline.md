@@ -2,7 +2,7 @@
 # PRD:  Job Alert Screening and Tailored CV Generator
 
 **Owner:** Tanya Rabourn
-**Status:** Draft v0.2
+**Status:** Draft v0.3 (2026-06-11: merged the two concatenated drafts, recorded resolved decisions)
 **Builds on:** job-matcher plugin v2.0 (github.com/rabourn/job-matcher)
 
 ## Purpose
@@ -55,9 +55,12 @@ Freshness rule: keep jobs whose canonical posted date is within 14 days. Jobs th
 - Apply dealbreakers from the brief: rigid office mandates, requirements-factory cultures, IC-only roles without ownership, pure research without product mandate.
 - Product-mandate guard (the keyword-bait check): when a role scores high mostly on methods keywords (foresight, workshops, storytelling, design thinking), check what the role produces and who owns the output. If outputs are reports feeding someone else's plan with no build or ship mandate, cap the score in the growth tier and flag the reason. This guard exists because methods vocabulary reliably over-attracts.
 
-### Stage 5: Report
+### Stage 5: Report and delivery via Recall
 - Produce a Markdown report per run: Tier 1 and Tier 2 jobs with score breakdown, two-line rationale, canonical link, verification status, and posted date. Skipped and stale jobs go in a collapsed summary with one-line reasons.
-- Deliver by saving to a reports folder and optionally emailing to self via the same Gmail account.
+- Deliver through the Recall stack (decided 2026-06-11, replaces the earlier email-to-self idea):
+  - Save the report to the repo reports folder and to the Obsidian vault at `~/cairn/projects/job-search/reports/`, where Recall's hourly sync indexes it.
+  - Maintain `~/cairn/projects/job-search/apply-queue.md`: pending Tier 1 roles with links to the canonical posting, the report, and the tailored CV draft.
+  - Recall's daily note generator gains a mechanical "Applications to send" section that surfaces the apply queue each morning (small change in the recall repo, same pattern as its schedule and compost sections).
 - No em dashes in any generated text.
 
 ### Stage 6: CV tailoring (Tier 1 only, human-gated)
@@ -103,37 +106,23 @@ IDML pipeline, as validated manually:
 1. Scraping LinkedIn itself.
 2. Auto-submission of applications.
 3. Cover letter generation (the page 3 letter story is replaced with a placeholder note in v1; tailored letters remain a manual or interactive step because they need judgment about positioning).
-4. Mobile execution. The pipeline runs on the Mac; results can be reviewed from the phone via the emailed report or Claude Code remote control.
+4. Mobile execution. The pipeline runs on the Mac; results can be reviewed from the phone via the Obsidian vault (daily note and apply queue) or Claude Code remote control.
 5. Sources beyond LinkedIn alert emails (the scanner interface should make adding Indeed or Google alert emails easy later).
 
 ## Open Questions
 
-1. Should Tier 1 results trigger a push notification rather than waiting for the emailed report?
+1. RESOLVED (2026-06-11): No push notification and no emailed report. Delivery is through Recall: reports and an apply queue land in the Obsidian vault, and the daily note surfaces pending applications (see Stage 5).
 2. RESOLVED: Story map config is generated automatically. A helper unzips the IDML, extracts text previews per story, and Claude classifies each story into a role (profile, core strengths, experience, methods, letter, tagline, header) with sensible editable defaults. The user supplies only the career brief and a recent IDML CV; the helper presents the inferred map for a quick confirmation before first use, then the pipeline relies on it. Re-run the helper whenever the template changes.
-3. Does the ledger eventually feed Recall, so job-search history becomes part of the personal memory system?
-4. Threshold for CV generation: Tier 1 only, or Tier 1 plus the top Tier 2 role per run?
-
-## Non-Goals
-
-The first version does not need to apply for jobs automatically.
-
-The first version does not need to log into LinkedIn.
-
-The first version does not need to generate cover letters unless added later.
-
-The first version does not need a full web dashboard.
+3. RESOLVED (2026-06-11): Yes, from v1. The vault files are indexed by Recall's hourly sync, so job-search history is searchable via `recall ask` immediately.
+4. RESOLVED (2026-06-11): Tier 1 only, as a config value (`cv_tiers`) so it is easy to widen later.
 
 ## Technical Approach
 
-Build as a Python script scheduled through cron, GitHub Actions, a local scheduler, or another lightweight automation service.
+Built as modules inside the job-matcher plugin (see "Why extend job-matcher" above), developed at `~/Projects/career/job-matcher`:
 
-Use the Gmail API to retrieve matching job alert emails.
-
-Use an LLM to parse emails, extract job details, compare jobs to the career brief, and generate tailored CV content.
-
-Use web search where needed to locate the job posting outside LinkedIn.
-
-Use an IDML parsing and generation process to modify the existing CV template and export a new IDML file.
+- Deterministic mechanics live in `scripts/` as standalone stdin/stdout filters, matching the plugin's existing conventions: alert email parsing, ledger operations, IDML story extraction and reassembly.
+- Judgment steps (scoring against the brief, story classification, CV content tailoring) are orchestrated by a `screen-alerts` skill, run headless via `claude -p` on the launchd schedule.
+- Gmail access via the Gmail MCP connector if available headless, otherwise the Gmail API with OAuth (Recall's Google OAuth plumbing is the reference implementation).
 
 ## Acceptance Criteria
 
@@ -148,10 +137,10 @@ A successful run should:
 7. Generate at least one tailored CV in IDML format using the example CV template
 8. Avoid fabricating job details, dates, or user experience
 
-## Open Questions
+## Resolved setup decisions (2026-06-11)
 
-1. Where will the career brief file be stored?
-2. Where will the IDML template be stored?
-3. Should the script generate a CV for every strong match or only the top one to three jobs per run?
-4. Should the system send a summary email after each run?
-5. Should final CVs require manual approval before being saved or exported?
+- Career brief: local copy at `data/career-brief.local.md`, fetched from the Google Doc source of truth (doc ID in `data/pipeline.local.json`). Stale warning after 60 days.
+- Master CV: `data/master-cv.idml` (save over it to update; the story map regenerates on mtime change).
+- CV generation: Tier 1 only per run (config: `cv_tiers`).
+- No summary email; delivery is via Recall (Stage 5).
+- All CV output is draft-only and human-reviewed before any use, per Key Requirement 7.
