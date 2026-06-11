@@ -32,6 +32,15 @@ gracefully and record problems in the run report instead.
 7. If a stage fails outright (Gmail unreachable, brief missing), write a run
    report that says so plainly and stop. A partial report that looks complete
    is worse than an honest failure report.
+8. Run every step SYNCHRONOUSLY in the foreground. Never use background
+   execution for any command and never end your turn before Phase 7 is
+   complete: in headless mode there is no next turn, and ending early kills
+   in-flight work (this exact failure happened on 2026-06-11: the resolver
+   was backgrounded, the turn ended, and 288 jobs were left unscored). Slow
+   commands are fine; wait for them.
+9. If the report file for today already exists, do not overwrite it; append
+   a -run2 (-run3, ...) suffix to the filename and use that name in all
+   links.
 
 ## Phase 0: Config and preflight
 
