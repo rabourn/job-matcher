@@ -30,3 +30,6 @@ test/*.pdf
 
 # Local-only fixtures (real email content)
 test/fixtures/*.local.*
+
+# Run logs
+logs/
