@@ -63,17 +63,24 @@ def make_id(source, *parts):
     return hashlib.md5(key.encode()).hexdigest()[:12]
 
 
+import re
+
+SENIORITY_PATTERNS = [
+    # Word boundaries matter: plain substring matching classified every
+    # "Director" title as executive because "director" contains "cto".
+    ("executive", re.compile(r"\b(chief|cto|ceo|cfo|coo|c-suite|vp|svp|evp|vice president)\b")),
+    ("director", re.compile(r"\b(director|head of|head,|principal)\b")),
+    ("senior", re.compile(r"\b(senior|sr\.?|lead|staff|manager)\b")),
+    ("junior", re.compile(r"\b(junior|jr\.?|entry|associate|intern|internship|graduate)\b")),
+]
+
+
 def infer_seniority(title):
     """Infer seniority level from job title."""
     title_lower = (title or "").lower()
-    if any(w in title_lower for w in ["chief", "cto", "ceo", "cfo", "coo", "c-suite", "vp ", "vice president"]):
-        return "executive"
-    if any(w in title_lower for w in ["director", "head of", "head,", "principal"]):
-        return "director"
-    if any(w in title_lower for w in ["senior", "sr.", "sr ", "lead", "staff", "manager"]):
-        return "senior"
-    if any(w in title_lower for w in ["junior", "jr.", "jr ", "entry", "associate", "intern", "graduate"]):
-        return "junior"
+    for level, pattern in SENIORITY_PATTERNS:
+        if pattern.search(title_lower):
+            return level
     return "mid"
 
 

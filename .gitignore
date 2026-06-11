@@ -27,3 +27,6 @@ test/*.pdf
 
 # Claude Code local settings
 .claude/
+
+# Local-only fixtures (real email content)
+test/fixtures/*.local.*
