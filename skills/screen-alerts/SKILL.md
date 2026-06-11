@@ -39,6 +39,11 @@ gracefully and record problems in the run report instead.
    only to learn the shape; a missing local config is a failure, see rule 7).
 2. Read the career brief at `career_brief_path`. If its mtime is older than
    `brief_stale_days`, add a STALE BRIEF warning to the report header.
+   Also read `brief_overrides_path` if it exists: private exclusions and
+   preferences that carry the same authority as the brief and win where they
+   conflict. The overrides file is local-only; never copy its contents into
+   committed files, and cite it in reports only as "private exclusion:
+   <category>".
 3. Check `master_cv_path` mtime against the `generated_from_mtime` field in
    `story_map_path`. If the map is missing or stale, regenerate:
    `python3 scripts/idml-story-map.py --cv <master_cv_path> --out <story_map_path>`
@@ -98,24 +103,27 @@ skills 0-30, seniority 0-20, sector 0-20, work mode 0-15, culture/values
 
 Apply, in this order:
 
-1. **Dealbreakers from the brief** (score 0, skipped with reason): rigid
+1. **Private overrides first**: exclusions from `brief_overrides_path` are
+   dealbreakers; quiet preferences adjust scores. In reports, cite only
+   "private exclusion: <category>".
+2. **Dealbreakers from the brief** (score 0, skipped with reason): rigid
    office mandates (5 days in office, mandatory relocation), requirements
    factory cultures, IC-only roles without ownership, innovation theater,
    pure research without product mandate, sales/quota roles, deep
    engineering build roles, PMO/reporting roles.
-2. **Standing location rules**:
+3. **Standing location rules**:
    - Dubai/UAE roles: assume visa sponsorship unless the posting says
      otherwise; do not penalize missing visa language.
    - US remote roles: viable (US citizen). "Must reside in US" plus remote
      is viable.
    - Singapore: acceptable, no penalty.
-3. **Product-mandate guard** (the keyword-bait check): if a role scores high
+4. **Product-mandate guard** (the keyword-bait check): if a role scores high
    mostly on methods keywords (foresight, workshops, storytelling, design
    thinking, HCD), check what the role produces and who owns the output. If
    outputs are reports feeding someone else's plan, with no build or ship
    mandate, cap the score at 59 (Tier 3) and record the reason. Methods
    vocabulary reliably over-attracts; this guard exists because of it.
-4. **Unverified penalty**: unverified jobs get recency 0 and are listed in a
+5. **Unverified penalty**: unverified jobs get recency 0 and are listed in a
    separate, clearly labeled section, after verified jobs, regardless of score.
 
 For every scored job, update the ledger:
