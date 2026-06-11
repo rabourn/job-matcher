@@ -85,10 +85,16 @@ def fetch_board(ats, slug, cache):
     key = (ats, slug)
     if key in cache:
         return cache[key]
-    scan = subprocess.run(
-        [os.path.join(SCRIPTS, f"scan-{ats}.sh"), slug],
-        capture_output=True, text=True, timeout=60,
-    )
+    try:
+        scan = subprocess.run(
+            [os.path.join(SCRIPTS, f"scan-{ats}.sh"), slug],
+            capture_output=True, text=True, timeout=30,
+        )
+    except (subprocess.TimeoutExpired, OSError) as e:
+        # A hung or failing probe means "no usable board", never a crashed run.
+        print(f"PROBE FAILED {ats}:{slug} ({type(e).__name__})", file=sys.stderr)
+        cache[key] = []
+        return []
     jobs = []
     if scan.returncode == 0 and scan.stdout.strip():
         norm = subprocess.run(
@@ -161,10 +167,14 @@ def resolve(job, known, cache, log):
         job["resolved_title"] = best.get("title", "")
         job["title_match_score"] = round(best_score, 3)
         job["verification_status"] = "GUARANTEED"
-        # Enrich from the canonical posting where the alert was thin
-        for field in ("location", "description_text", "salary_min", "salary_max", "salary_currency"):
+        # Enrich from the canonical posting where the alert was thin. The
+        # canonical description always wins when it is more substantial:
+        # alert snippets are boilerplate at best.
+        for field in ("location", "salary_min", "salary_max", "salary_currency"):
             if not job.get(field) and best.get(field):
                 job[field] = best[field]
+        if len(best.get("description_text") or "") > len(job.get("description_text") or ""):
+            job["description_text"] = best["description_text"]
         if best.get("work_mode") and job.get("work_mode") in ("", "unknown"):
             job["work_mode"] = best["work_mode"]
             job["remote"] = best["work_mode"] == "remote"

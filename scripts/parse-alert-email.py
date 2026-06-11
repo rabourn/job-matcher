@@ -142,6 +142,9 @@ def parse_card(card_lines, alert_terms, email_date, email_subject):
             if not view_url:
                 view_url = line
             continue
+        # Wrapped tracking-URL continuation lines (no spaces, token markers)
+        if (" " not in line and len(line) > 60) or any(t in line for t in ("trk=", "otpToken", "midToken", "trkEmail")):
+            continue
         if is_boilerplate(line):
             extras.append(line)
             continue
