@@ -11,6 +11,14 @@ career-brief.md
 # Personal overrides (local company lists, custom keywords, etc.)
 data/*.local.json
 
+# Personal pipeline data (career brief, master CV, ledger, generated CVs)
+data/*.local.md
+data/master-cv.idml
+data/story-map.json
+data/ledger.db
+data/cv-drafts/
+reports/
+
 # Personal test data
 test/*.pdf
 
