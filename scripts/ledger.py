@@ -137,7 +137,11 @@ def cmd_upsert(args):
                                      canonical_url, source_type, posted_date, linkedin_url)
                    VALUES (?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?)""",
                 (key, job.get("company", ""), job.get("title", ""), job.get("location", ""),
-                 ts, ts, job.get("canonical_url", "") or job.get("url", ""),
+                 ts, ts,
+                 # canonical_url stays empty until the resolve stage fills it;
+                 # job.url at ingest is the LinkedIn lead, which lives in
+                 # linkedin_url (provenance) and must never look canonical.
+                 job.get("canonical_url", ""),
                  job.get("source_type", "") or job.get("source", ""),
                  job.get("posted_date", ""), job.get("linkedin_url", "")),
             )
