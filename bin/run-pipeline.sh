@@ -20,6 +20,11 @@ LOG="logs/run-$(date +%Y%m%d-%H%M%S).log"
 # last-resort resolver. Bash drives the scripts/ filters.
 ALLOWED_TOOLS="Bash,Read,Write,Edit,Glob,Grep,ToolSearch,WebSearch,WebFetch,mcp__claude_ai_Gmail__search_threads,mcp__claude_ai_Gmail__get_thread"
 
+# Default to Opus for scheduled runs (decision 2026-06-12: CV drafting quality
+# matters; revisit scoring on Sonnet if usage becomes a problem). Interactive
+# sessions stay on the user's default model.
+PIPELINE_MODEL="${PIPELINE_MODEL:-opus}"
+
 PROMPT="Read skills/screen-alerts/SKILL.md in this repository and execute it exactly, start to finish. Work from the repo root. Do not ask questions."
 
 {

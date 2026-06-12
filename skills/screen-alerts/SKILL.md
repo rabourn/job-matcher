@@ -98,10 +98,24 @@ gracefully and record problems in the run report instead.
    `scripts/verify-url.sh <url>`: VERIFIED -> source_type "web";
    EXPIRED -> mark skipped with reason; otherwise source_type stays
    "unverified".
-4. Freshness rule: jobs whose canonical posted_date is older than
+4. Manual evidence folder: read any PDFs in `data/job-ads/` not yet prefixed
+   `.processed-`. For each, extract company, title, work mode, posted date,
+   and description from the ad, then match to a ledger row (same fuzzy
+   company+title spirit as resolve-job.py; check both this batch and
+   existing rows via `ledger.py check`). On a match: treat the ad as the
+   job's full text for scoring, set source_type "manual",
+   verification_status MANUAL_EVIDENCE, and use any posted date from the ad
+   for freshness. The user supplied the ad deliberately, so a manual-
+   evidence job skips the unverified penalty, but it is still labeled
+   "manual evidence (user-supplied ad)" in the report with the citation.
+   If a PDF matches no known job, score it as a new lead anyway and note
+   where it came from. After processing, rename the file with a
+   `.processed-` prefix.
+5. Freshness rule: jobs whose canonical posted_date is older than
    `freshness_days` are skipped with reason "stale (posted <date>)".
    Jobs with no canonical date stay unverified: labeled, ranked below
-   verified jobs, never dropped.
+   verified jobs, never dropped. Manual-evidence jobs without a date in
+   the ad count as fresh: the user just printed them.
 
 ## Phase 4: Score against the career brief
 

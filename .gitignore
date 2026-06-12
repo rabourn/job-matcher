@@ -33,3 +33,7 @@ test/fixtures/*.local.*
 
 # Run logs
 logs/
+
+# Manual job-ad evidence (personal data)
+data/job-ads/*
+!data/job-ads/README.md
