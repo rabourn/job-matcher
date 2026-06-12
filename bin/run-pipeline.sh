@@ -13,7 +13,9 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_ROOT"
 
 mkdir -p logs
-LOG="logs/run-$(date +%Y%m%d-%H%M%S).log"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+LOG="logs/run-${STAMP}.log"          # human-readable: final report text
+TRACE="logs/run-${STAMP}.jsonl"      # full action trace: every tool call and result
 
 # Tools the pipeline is allowed to use unattended. Gmail tools are the
 # claude.ai connector (validated to work headless). WebSearch is the
@@ -27,13 +29,22 @@ PIPELINE_MODEL="${PIPELINE_MODEL:-opus}"
 
 PROMPT="Read skills/screen-alerts/SKILL.md in this repository and execute it exactly, start to finish. Work from the repo root. Do not ask questions."
 
-{
-  echo "=== screen-alerts run $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
-  ${CLAUDE_BIN:-claude} -p "$PROMPT" \
-    --allowedTools "$ALLOWED_TOOLS" \
-    --output-format text \
-    ${PIPELINE_MODEL:+--model "$PIPELINE_MODEL"}
-  status=$?
-  echo "=== exit $status at $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
-  exit $status
-} >> "$LOG" 2>&1
+echo "=== screen-alerts run $(date -u +%Y-%m-%dT%H:%M:%SZ) ===" >> "$LOG"
+
+# stream-json --verbose emits every event (assistant turns, tool calls, tool
+# results) as JSONL: the forensic record when a run does something
+# non-obvious. The human-readable final text is extracted into $LOG after.
+${CLAUDE_BIN:-claude} -p "$PROMPT" \
+  --allowedTools "$ALLOWED_TOOLS" \
+  --output-format stream-json --verbose \
+  ${PIPELINE_MODEL:+--model "$PIPELINE_MODEL"} \
+  >> "$TRACE" 2>> "$LOG"
+status=$?
+
+# Pull the final result text (and session id for transcript lookup) into the
+# readable log. jq -r over the result event; tolerate a missing one (crash).
+if command -v jq >/dev/null; then
+  jq -r 'select(.type == "result") | "session: \(.session_id // "unknown")\n\n\(.result // "(no result text)")"' "$TRACE" >> "$LOG" 2>/dev/null
+fi
+echo "=== exit $status at $(date -u +%Y-%m-%dT%H:%M:%SZ) | full trace: $TRACE ===" >> "$LOG"
+exit $status
