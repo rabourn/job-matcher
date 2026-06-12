@@ -111,6 +111,21 @@ gracefully and record problems in the run report instead.
    If a PDF matches no known job, score it as a new lead anyway and note
    where it came from. After processing, rename the file with a
    `.processed-` prefix.
+
+   Precedence when the matched job already has a disposition (a duplicate
+   drop is a user mistake to absorb, not an override):
+   - Already verified (source_type ats/api/web): keep the stronger
+     verification; use the ad only to fill missing description or work
+     mode. Report note: "ad supplied; already verified via <source>".
+   - Status applied: do nothing; note "ad supplied for a role already
+     applied to".
+   - Status skipped: do NOT re-score or resurrect. Note "ad supplied for a
+     role previously skipped (<original reason>); ask me to reconsider it
+     if that was intentional". An explicit user request in a session is
+     the only path back from skipped.
+   - Status reported but unverified: the intended case; upgrade to manual
+     evidence and re-score.
+   In every case the PDF is renamed `.processed-` so it is consumed once.
 5. Freshness rule: jobs whose canonical posted_date is older than
    `freshness_days` are skipped with reason "stale (posted <date>)".
    Jobs with no canonical date stay unverified: labeled, ranked below
