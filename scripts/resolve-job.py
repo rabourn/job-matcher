@@ -110,6 +110,48 @@ def fetch_board(ats, slug, cache):
     return jobs
 
 
+def fetch_workday(tenant, title, cache):
+    """Search a Workday tenant for a title, with per-run discovery caching.
+
+    Cache stores (site, wd) per tenant after the first successful discovery
+    (or None for tenants with no Workday board), so later jobs at the same
+    company skip the robots.txt probing. Search results are per-title, so
+    they are not cached themselves.
+    """
+    disc_key = ("workday-site", tenant)
+    if cache.get(disc_key, "unset") is None:
+        return []
+    args = [os.path.join(SCRIPTS, "scan-workday.sh"), tenant, title]
+    if disc_key in cache:
+        site, wd = cache[disc_key]
+        args += [site, wd]
+    try:
+        scan = subprocess.run(args, capture_output=True, text=True, timeout=90)
+    except (subprocess.TimeoutExpired, OSError) as e:
+        print(f"PROBE FAILED workday:{tenant} ({type(e).__name__})", file=sys.stderr)
+        cache[disc_key] = None
+        return []
+    try:
+        data = json.loads(scan.stdout) if scan.stdout.strip() else {}
+    except json.JSONDecodeError:
+        data = {}
+    if not data.get("site"):
+        if disc_key not in cache:
+            cache[disc_key] = None
+        return []
+    cache[disc_key] = (data["site"], data["wd"])
+    norm = subprocess.run(
+        [sys.executable, os.path.join(SCRIPTS, "normalize-jobs.py"), "--source", "workday"],
+        input=scan.stdout, capture_output=True, text=True,
+    )
+    if norm.returncode == 0 and norm.stdout.strip():
+        try:
+            return json.loads(norm.stdout)
+        except json.JSONDecodeError:
+            return []
+    return []
+
+
 def load_known_companies(paths):
     """Map normalized company name -> (ats, slug) from target-companies files."""
     known = {}
@@ -156,6 +198,18 @@ def resolve(job, known, cache, log):
         # keep probing other slugs/ATSes only if no good match yet.
         if best_score >= TITLE_MATCH_THRESHOLD:
             break
+
+    # Workday last: heavier discovery, but it is where most enterprise
+    # employers live (Mastercard, AstraZeneca, Zillow, ...).
+    if best_score < TITLE_MATCH_THRESHOLD:
+        for slug in slug_candidates(company):
+            board = fetch_workday(slug, title, cache)
+            for posting in board:
+                score = title_similarity(title, posting.get("title", ""))
+                if score > best_score:
+                    best, best_score, best_meta = posting, score, ("workday", slug)
+            if best_score >= TITLE_MATCH_THRESHOLD:
+                break
 
     if best and best_score >= TITLE_MATCH_THRESHOLD:
         job["canonical_url"] = best.get("url", "")

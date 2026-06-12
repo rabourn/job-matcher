@@ -518,8 +518,60 @@ def normalize_rss(data):
     return results
 
 
+def workday_posted_to_date(posted_on):
+    """Convert Workday's relative 'Posted N Days Ago' text to YYYY-MM-DD.
+
+    '30+ Days Ago' maps to 31 days ago: precise enough for the 14-day
+    freshness rule, which only needs to know it is stale.
+    """
+    from datetime import date, timedelta
+    text = (posted_on or "").lower()
+    if "today" in text:
+        days = 0
+    elif "yesterday" in text:
+        days = 1
+    else:
+        m = re.search(r"(\d+)\+?\s*days?\s*ago", text)
+        if not m:
+            return ""
+        days = int(m.group(1)) + (1 if "+" in text else 0)
+    return (date.today() - timedelta(days=days)).strftime("%Y-%m-%d")
+
+
+def normalize_workday(data):
+    """Normalize scan-workday.sh output (Workday CXS API)."""
+    jobs = data.get("jobs", []) if isinstance(data, dict) else data
+    results = []
+    for job in jobs:
+        location = job.get("locationsText", "") or ""
+        results.append({
+            "id": make_id("workday", job.get("externalPath") or job.get("title")),
+            "source": "workday",
+            "source_id": (job.get("bulletFields") or [""])[0],
+            "title": job.get("title", ""),
+            "company": "",  # backfilled via --company; CXS response has no name
+            "location": location,
+            "remote": "remote" in location.lower(),
+            "work_mode": infer_work_mode(location),
+            "employment_type": "",
+            "seniority": infer_seniority(job.get("title", "")),
+            "salary_min": None,
+            "salary_max": None,
+            "salary_currency": None,
+            "posted_date": workday_posted_to_date(job.get("postedOn")),
+            "description_text": "",
+            "url": job.get("externalUrl", ""),
+            "apply_url": job.get("externalUrl", ""),
+            "departments": [],
+            "tags": [],
+            "verification_status": "GUARANTEED",
+        })
+    return results
+
+
 NORMALIZERS = {
     "greenhouse": normalize_greenhouse,
+    "workday": normalize_workday,
     "lever": normalize_lever,
     "workable": normalize_workable,
     "ashby": normalize_ashby,
