@@ -63,6 +63,23 @@ def make_id(source, *parts):
     return hashlib.md5(key.encode()).hexdigest()[:12]
 
 
+def to_date(value):
+    """Coerce an API date (ISO string, epoch seconds, or epoch millis) to YYYY-MM-DD.
+
+    Himalayas started returning pubDate as an epoch integer (observed
+    2026-06-11), which crashed the previous string-slice approach.
+    """
+    if value is None or value == "":
+        return ""
+    if isinstance(value, (int, float)):
+        ts = value / 1000 if value > 1e11 else value
+        try:
+            return datetime.fromtimestamp(ts).strftime("%Y-%m-%d")
+        except (ValueError, OSError, OverflowError):
+            return ""
+    return str(value)[:10]
+
+
 import re
 
 SENIORITY_PATTERNS = [
@@ -375,7 +392,7 @@ def normalize_jobicy(data):
             "salary_min": salary_min,
             "salary_max": salary_max,
             "salary_currency": salary_currency,
-            "posted_date": (job.get("pubDate") or "")[:10],
+            "posted_date": to_date(job.get("pubDate")),
             "description_text": strip_html(job.get("jobDescription", "")),
             "url": job.get("url", ""),
             "apply_url": job.get("url", ""),
@@ -421,7 +438,7 @@ def normalize_himalayas(data):
             "salary_min": salary_min,
             "salary_max": salary_max,
             "salary_currency": salary_currency,
-            "posted_date": (job.get("pubDate") or job.get("postedDate", ""))[:10] if job.get("pubDate") or job.get("postedDate") else "",
+            "posted_date": to_date(job.get("pubDate") or job.get("postedDate")),
             "description_text": strip_html(job.get("description", "")),
             "url": job.get("applicationUrl", "") or f"https://himalayas.app/jobs/{job.get('slug', '')}",
             "apply_url": job.get("applicationUrl", "") or f"https://himalayas.app/jobs/{job.get('slug', '')}",
@@ -490,7 +507,7 @@ def normalize_rss(data):
             "salary_min": None,
             "salary_max": None,
             "salary_currency": None,
-            "posted_date": (item.get("pubDate") or item.get("published", ""))[:10] if item.get("pubDate") or item.get("published") else "",
+            "posted_date": to_date(item.get("pubDate") or item.get("published")),
             "description_text": strip_html(item.get("description", "") or item.get("summary", "")),
             "url": item.get("link", ""),
             "apply_url": item.get("link", ""),
