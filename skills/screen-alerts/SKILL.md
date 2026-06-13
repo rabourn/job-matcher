@@ -71,6 +71,13 @@ turn, never background a command: run everything synchronously (rule 8).
    conflict. The overrides file is local-only; never copy its contents into
    committed files, and cite it in reports only as "private exclusion:
    <category>".
+   Also read `experience_bank_path` if it exists: the candidate's full career
+   history (including jobs too old or minor for the printed CV) plus academic
+   CV. It is confirmed-true source material. Use it in scoring (credit
+   experience the 2-page CV omits) and in CV tailoring (draw real details
+   from it when rewriting editable sections, especially earlier-career;
+   surface a role-relevant old job in the candidate's true words). Never
+   invent beyond what it states; never copy it into committed files.
 3. Check `master_cv_path` mtime against the `generated_from_mtime` field in
    `story_map_path`. If the map is missing or stale, regenerate:
    `python3 scripts/idml-story-map.py --cv <master_cv_path> --out <story_map_path>`

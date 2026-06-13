@@ -44,3 +44,6 @@ data/.run-tmp-*
 
 # Applications scan temp records
 data/.applications-*.json
+
+# Full career history + academic CV (personal)
+data/experience-bank.local.md

@@ -1,29 +1,27 @@
 {
   "_comment": "Copy to pipeline.local.json (gitignored) and fill in real paths. All paths may use ~.",
-
   "career_brief_path": "~/path/to/career-brief.local.md",
   "career_brief_source_doc": "GOOGLE_DOC_ID",
   "brief_stale_days": 60,
   "brief_overrides_path": "data/brief-overrides.local.md",
-
+  "experience_bank_path": "data/experience-bank.local.md",
   "master_cv_path": "data/master-cv.idml",
   "story_map_path": "data/story-map.json",
   "cv_drafts_dir": "data/cv-drafts",
   "cv_length_budget_pct": 10,
-  "cv_tiers": [1],
-
+  "cv_tiers": [
+    1
+  ],
   "ledger_path": "data/ledger.db",
   "ledger_expire_days": 60,
-
-  "gmail_senders": ["jobalerts-noreply@linkedin.com"],
+  "gmail_senders": [
+    "jobalerts-noreply@linkedin.com"
+  ],
   "gmail_lookback_days": 14,
-
   "freshness_days": 14,
-
   "reports_dir": "reports",
   "vault_reports_dir": "~/cairn/career/reports",
   "vault_apply_queue": "~/cairn/career/apply-queue.md",
-
   "location_rules": {
     "_comment": "Standing rules applied during scoring, see PRD Stage 4",
     "uae_assume_visa_sponsorship": true,
