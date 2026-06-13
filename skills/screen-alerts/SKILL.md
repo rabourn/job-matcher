@@ -225,14 +225,7 @@ For every scored job, update the ledger:
      verify against a canonical source".
    - Collapsed summary (details/summary block) of skipped jobs with one line
      reasons: stale, dealbreaker, duplicate, expired.
-3. Update `<vault_apply_queue>`: regenerate the file from
-   `python3 scripts/ledger.py queue --status reported --tier 1`. One section
-   per pending role: title, company, score, canonical link, report link,
-   CV draft path (once generated), and a checkbox line
-   `- [ ] applied / - [ ] skipped`. Keep frontmatter
-   `type: apply-queue` so Recall indexes it cleanly. When the user marks a
-   role applied or skipped in conversation, reflect it with
-   `ledger.py set-status` and regenerate the queue.
+3. Regenerate the apply queue deterministically: `python3 scripts/render-apply-queue.py`. It reads Tier 1 reported rows from the ledger and writes `<vault_apply_queue>` in the exact `## {Title}: {Company}` format the Recall daily note parses. Do NOT hand-write the queue; the script owns its format. When the user marks a role applied or skipped, update the ledger with `ledger.py set-status` and re-run the renderer.
 4. Vault writes are additive only: never modify other files in the vault.
 
 ## Phase 6: CV drafts for Tier 1 (human-gated)

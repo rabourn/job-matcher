@@ -3,7 +3,7 @@
 
 Usage:
     cat records.json | python3 update-applications.py
-    cat records.json | python3 update-applications.py --tracker ~/cairn/projects/job-search/applications.md
+    cat records.json | python3 update-applications.py --tracker ~/cairn/career/applications.md
 
 records.json: a list of application records extracted from Gmail (by the agent,
 which reads the fuzzy email text). Each record:
@@ -35,7 +35,7 @@ from datetime import datetime, timezone
 from difflib import SequenceMatcher
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DEFAULT_TRACKER = os.path.expanduser("~/cairn/projects/job-search/applications.md")
+DEFAULT_TRACKER = os.path.expanduser("~/cairn/career/applications.md")
 DEFAULT_LEDGER = os.path.join(ROOT, "data", "ledger.db")
 
 STAGE_ORDER = {"applied": 1, "acknowledged": 2, "interviewing": 3,

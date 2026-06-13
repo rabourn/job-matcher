@@ -58,8 +58,8 @@ Freshness rule: keep jobs whose canonical posted date is within 14 days. Jobs th
 ### Stage 5: Report and delivery via Recall
 - Produce a Markdown report per run: Tier 1 and Tier 2 jobs with score breakdown, two-line rationale, canonical link, verification status, and posted date. Skipped and stale jobs go in a collapsed summary with one-line reasons.
 - Deliver through the Recall stack (decided 2026-06-11, replaces the earlier email-to-self idea):
-  - Save the report to the repo reports folder and to the Obsidian vault at `~/cairn/projects/job-search/reports/`, where Recall's hourly sync indexes it.
-  - Maintain `~/cairn/projects/job-search/apply-queue.md`: pending Tier 1 roles with links to the canonical posting, the report, and the tailored CV draft.
+  - Save the report to the repo reports folder and to the Obsidian vault at `~/cairn/career/reports/`, where Recall's hourly sync indexes it.
+  - Maintain `~/cairn/career/apply-queue.md`: pending Tier 1 roles with links to the canonical posting, the report, and the tailored CV draft.
   - Recall's daily note generator gains a mechanical "Applications to send" section that surfaces the apply queue each morning (small change in the recall repo, same pattern as its schedule and compost sections).
 - No em dashes in any generated text.
 

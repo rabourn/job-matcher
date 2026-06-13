@@ -12,7 +12,7 @@ One-time setup for the screen-alerts pipeline (PRD: PRD-job-alert-pipeline.md).
 - `data/ledger.db`: created by `scripts/ledger.py init`
 - Gmail access: the claude.ai Gmail connector, validated to work in headless
   `claude -p` runs
-- Vault: `~/cairn/projects/job-search/` with `reports/` and `apply-queue.md`
+- Vault: `~/cairn/career/` with `reports/` and `apply-queue.md`
 
 ## Test a run manually
 
@@ -46,8 +46,8 @@ recall's sync job.
 
 ## Where things land after each run
 
-- Report: `reports/YYYY-MM-DD-job-screen.md` and `~/cairn/projects/job-search/reports/`
-- Apply queue: `~/cairn/projects/job-search/apply-queue.md`
+- Report: `reports/YYYY-MM-DD-job-screen.md` and `~/cairn/career/reports/`
+- Apply queue: `~/cairn/career/apply-queue.md`
 - CV drafts: `data/cv-drafts/CV-rabourn-<company>-<date>.idml` plus `.changes.txt`
 - Run history: `runs` table in `data/ledger.db`; one line per run in `logs/pipeline.log`
 

@@ -21,8 +21,8 @@
   "freshness_days": 14,
 
   "reports_dir": "reports",
-  "vault_reports_dir": "~/cairn/projects/job-search/reports",
-  "vault_apply_queue": "~/cairn/projects/job-search/apply-queue.md",
+  "vault_reports_dir": "~/cairn/career/reports",
+  "vault_apply_queue": "~/cairn/career/apply-queue.md",
 
   "location_rules": {
     "_comment": "Standing rules applied during scoring, see PRD Stage 4",

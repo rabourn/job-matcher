@@ -8,8 +8,8 @@ Status: pipeline side implemented; Recall side designed, not yet implemented
 The screen-alerts pipeline writes two things into the Obsidian vault
 (`~/cairn`), which Recall's hourly sync indexes automatically:
 
-1. Run reports: `projects/job-search/reports/YYYY-MM-DD-job-screen.md`
-2. The apply queue: `projects/job-search/apply-queue.md`, regenerated from
+1. Run reports: `career/reports/YYYY-MM-DD-job-screen.md`
+2. The apply queue: `career/apply-queue.md`, regenerated from
    the ledger each run
 
 Because both are ordinary vault files, `recall ask "what jobs should I apply
@@ -51,7 +51,7 @@ In `recall/commands/generate_cmd.py`, add a deterministic section to the
 daily note, same pattern as "Today's schedule":
 
 1. New helper `_render_apply_queue_block(vault)`:
-   - Read `vault / "projects/job-search/apply-queue.md"`. Missing file or
+   - Read `vault / "career/apply-queue.md"`. Missing file or
      parse trouble: return `None` (section omitted, never an error).
    - A role is pending if its section has no ticked checkbox
      (`- [x]`). For each pending role, emit one line:

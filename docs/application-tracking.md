@@ -34,7 +34,7 @@ New scan phase (own Gmail search, separate from the LinkedIn alert ingest):
    - plus known ATS/recruiter senders (greenhouse, lever, workday, ashby,
      myworkday, smartrecruiters, tech.gov.sg, recruitment.* domains).
 2. Parse company, title (from subject or body), signal type, date.
-3. Update `~/cairn/projects/job-search/applications.md`:
+3. Update `~/cairn/career/applications.md`:
    - new application -> "Awaiting response"
    - acknowledgement on an existing entry -> status acknowledged
    - interview -> "Interviewing" section
