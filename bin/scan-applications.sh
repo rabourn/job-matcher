@@ -28,7 +28,7 @@ OUT="data/.applications-${STAMP}.json"
 
 PROMPT="Search Gmail for job-application lifecycle emails from the last ${DAYS} days: application acknowledgements ('thank you for applying', 'we received your application', 'your application was sent'), rejections ('not proceeding', 'regret to inform', 'unfortunately we'), and interview invitations (Teams/Zoom invites tied to a role, 'invite you to interview', 'next steps'). Be CONSERVATIVE: include only genuine emails about Tanya's own job applications. EXCLUDE newsletters, job-board digests (LinkedIn alerts, design-gigs mailing lists), recruiter prospecting/spam (GulfTalent etc.), conference CFPs, and marketing.
 
-For each genuine email, extract one record: {company, title, status (applied|acknowledged|interviewing|rejected|offer|withdrawn), date (YYYY-MM-DD), source (short, e.g. sender domain or 'LinkedIn'), note (optional)}. If a title is not stated, use 'role unconfirmed' and add a note. Write a JSON array of records to ${OUT} and nothing else. Run synchronously; do not background."
+For each genuine email, extract one record: {company, title, status (applied|acknowledged|interviewing|rejected|offer|withdrawn), date (YYYY-MM-DD), location (city or country if stated), work_mode (remote|hybrid|onsite if stated), source (short), note (optional)}. If a title is not stated, use 'role unconfirmed' and add a note. Write a JSON array of records to ${OUT} and nothing else. Run synchronously; do not background."
 
 "$CLAUDE_BIN" -p "$PROMPT" \
   --allowedTools "Bash,Read,Write,ToolSearch,mcp__claude_ai_Gmail__search_threads,mcp__claude_ai_Gmail__get_thread" \

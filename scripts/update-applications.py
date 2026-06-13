@@ -90,7 +90,10 @@ def parse_tracker(path):
             continue
         f = re.match(r"^-\s+(\w[\w ]*?):\s+(.*)$", line.strip())
         if f and current is not None:
-            current[f.group(1).strip()] = f.group(2).strip()
+            key, val = f.group(1).strip(), f.group(2).strip()
+            if key == "applied":   # rendered label for the internal "date" field
+                key = "date"
+            current[key] = val
     return records
 
 
@@ -104,7 +107,7 @@ def merge(existing, incoming):
             new_stage = STAGE_ORDER.get(r.get("status", "applied"), 1)
             if new_stage >= cur_stage:
                 cur["status"] = r.get("status", cur.get("status"))
-                for fld in ("date", "location", "source", "note"):
+                for fld in ("date", "location", "work_mode", "source", "note"):
                     if r.get(fld):
                         cur[fld] = r[fld]
         else:
@@ -125,10 +128,22 @@ def render(records, path):
         out.append("")
         for r in sorted(group, key=lambda x: x.get("date", ""), reverse=True):
             out.append(f"### {r.get('title','(unknown)')}: {r.get('company','(unknown)')}")
-            for fld in ("status", "date", "location", "source", "note"):
+            if r.get("status"):
+                out.append(f"- status: {r['status']}")
+            if r.get("date"):
+                out.append(f"- applied: {r['date']}")
+            # Location and work mode shown together: "Dubai (onsite)", "Remote",
+            # or "Remote, US". Whichever fields we have.
+            loc, wm = r.get("location", ""), r.get("work_mode", "")
+            if loc and wm and wm.lower() not in loc.lower():
+                out.append(f"- location: {loc} ({wm})")
+            elif loc:
+                out.append(f"- location: {loc}")
+            elif wm:
+                out.append(f"- location: {wm}")
+            for fld in ("source", "note"):
                 if r.get(fld):
-                    label = "applied" if fld == "date" else fld
-                    out.append(f"- {label}: {r[fld]}")
+                    out.append(f"- {fld}: {r[fld]}")
             out.append("")
     with open(path, "w", encoding="utf-8") as fh:
         fh.write("\n".join(out).rstrip() + "\n")
