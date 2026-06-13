@@ -18,6 +18,24 @@ Work from the repo root (the directory containing this plugin). Be quietly
 mechanical: this runs unattended. Never ask the user questions; degrade
 gracefully and record problems in the run report instead.
 
+## Architecture (how this skill is invoked)
+
+`bin/run-pipeline.sh` splits this pipeline into three phases so the slow,
+mechanical resolve step never sits inside an LLM turn (the agent twice
+backgrounded it and abandoned the batch, 2026-06-11 and 2026-06-13):
+
+- **Ingest (agent):** Phase 0-1 only. Gmail search and parse, writing parsed
+  jobs to a temp file. Invoked with a scoped prompt.
+- **Resolve (deterministic bash):** `scripts/pipeline-mechanical.sh` runs
+  dedup, ledger upsert, and resolution to a temp `resolved.json`. No agent.
+- **Score (agent):** Phase 4 onward. Reads `resolved.json` and does the
+  judgment work: scoring, report, ledger updates, apply queue, CV drafts.
+
+When invoked for scoring, resolution is already done: read the resolved file,
+do NOT re-ingest or re-resolve. The phase docs below remain the reference for
+what each step must accomplish. If this skill is ever run end-to-end in one
+turn, never background a command: run everything synchronously (rule 8).
+
 ## Hard rules (from the PRD)
 
 1. NEVER fetch LinkedIn URLs. The email is a lead source only.

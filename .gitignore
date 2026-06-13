@@ -37,3 +37,7 @@ logs/
 # Manual job-ad evidence (personal data)
 data/job-ads/*
 !data/job-ads/README.md
+
+# Pipeline run temp dirs
+data/.pipeline-*
+data/.run-tmp-*
