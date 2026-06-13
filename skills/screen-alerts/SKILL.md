@@ -238,12 +238,28 @@ submit anything.
    and their roles come from the map; never touch stories outside the
    whitelist.
 2. For each Tier 1 role, draft replacement text for: profile paragraph, core
-   strengths line, swappable experience bullets, methods and tools line. The
-   page 3 letter story gets the v1 placeholder note, not a tailored letter.
+   strengths line, methods and tools line, AND the most role-relevant
+   experience bullets. The page 3 letter story gets the v1 placeholder note,
+   not a tailored letter.
+
+   The experience bullets are the point, not an afterthought. Editing only
+   the three framing lines makes every CV nearly identical (observed
+   2026-06-13). Read the full job ad, then rewrite 4-6 of the master CV's
+   experience bullets so they say the SAME true thing in the AD'S vocabulary:
+   mirror its key terms (e.g. for a museum role: "digital literacy",
+   "audience", "evidence-based recommendations"; for fintech: "payments",
+   "risk", "compliance"). Reword and reorder emphasis only; never invent
+   experience the master CV does not support. idml-apply.py replaces existing
+   runs but cannot add new bullets, so to surface a role-critical theme
+   (e.g. budget/team management) reword the least-relevant existing bullet
+   into it. Use the story map's run texts to pick which bullets to edit.
+
    Content rules: every claim traces to the master CV or career brief;
    British or American spelling follows the posting; tone matches the master
-   CV; no em dashes; each replacement within ±`cv_length_budget_pct`% of the
-   original character count.
+   CV; no em dashes. Framing lines stay within ±`cv_length_budget_pct`%
+   (default 10); experience bullets may use up to ±15% (pass
+   `--budget-pct 15`), since a few words of the ad's vocabulary need the room
+   and the section's total length stays roughly constant.
 3. Apply: `python3 scripts/idml-apply.py --cv <master_cv_path> --map <story_map_path> --edits <edits.json> --out <cv_drafts_dir>/CV-rabourn-<company-slug>-<YYYY-MM-DD>.idml`
    The script enforces the whitelist, length budget, XML well-formedness,
    and IDML packaging rules; treat its failure as a per-job failure, note it
