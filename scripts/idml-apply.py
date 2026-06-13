@@ -18,10 +18,10 @@ lists every editable story's runs in document order. Guarantees:
 - Replacement happens at the level of individual <Content> text runs via
   surgical string substitution; every byte outside the replaced run is
   untouched, so styles, geometry, and spreads cannot drift.
-- Length budget: each replacement must stay within +/-N% of the original
-  run's character count (default 10, --budget-pct to change), to limit
-  overset risk. The script cannot render frames; always check for overset
-  in InDesign.
+- Length budget (asymmetric): growth is capped at +N% (--budget-pct, default
+  10) because it risks overset; shrinking is permitted down to --min-fraction
+  of the original (default 0.4), since dropping irrelevant items only leaves
+  white space. The script cannot render frames; always check overset in InDesign.
 - No em dashes in replacement text (PRD content rule).
 - The CV's mtime must match the map's generated_from_mtime (stale map = error).
 - Every modified story is re-validated as well-formed XML.
@@ -56,7 +56,7 @@ def escape(text):
     return (text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
 
 
-def apply_edits_to_story(xml_text, edits, story, budget_pct):
+def apply_edits_to_story(xml_text, edits, story, budget_pct, min_fraction):
     """Replace the text of specific Content runs. Returns (new_xml, changes)."""
     matches = list(CONTENT_RE.finditer(xml_text))
     changes = []
@@ -71,12 +71,19 @@ def apply_edits_to_story(xml_text, edits, story, budget_pct):
         run_info = next((r for r in (story.get("runs") or []) if r["index"] == idx), None)
         old_raw = matches[idx].group(1)
         old_len = run_info["chars"] if run_info else len(old_raw)
-        lo = old_len * (1 - budget_pct / 100.0)
+        # Asymmetric budget. Growth risks overset (text overflowing the frame),
+        # so the upper bound is tight (budget_pct). Shrinking only leaves white
+        # space and is always layout-safe, so the lower bound is generous:
+        # dropping irrelevant items (e.g. methods/tools) is encouraged. The
+        # floor (min_fraction) exists only to stop a section being gutted to
+        # near-nothing, which would look wrong on the page.
+        lo = old_len * min_fraction
         hi = old_len * (1 + budget_pct / 100.0)
         if not (lo <= len(new_text) <= hi):
             raise ValueError(
                 f"story {story['id']} run {idx}: length {len(new_text)} outside "
-                f"budget {lo:.0f}-{hi:.0f} (original {old_len}, +/-{budget_pct}%)")
+                f"budget {lo:.0f}-{hi:.0f} (original {old_len}; grow <= +{budget_pct}%, "
+                f"shrink >= {min_fraction*100:.0f}% of original)")
         start, end = matches[idx].span(1)
         xml_text = xml_text[:start] + escape(new_text) + xml_text[end:]
         changes.append({
@@ -112,7 +119,10 @@ def main():
     parser.add_argument("--map", required=True, dest="map_path")
     parser.add_argument("--edits", required=True)
     parser.add_argument("--out", required=True)
-    parser.add_argument("--budget-pct", type=float, default=10.0)
+    parser.add_argument("--budget-pct", type=float, default=10.0,
+                        help="max growth %% (overset risk); shrinking is far more permissive")
+    parser.add_argument("--min-fraction", type=float, default=0.4,
+                        help="floor on shrink: a run may drop to this fraction of its original length (default 0.4)")
     parser.add_argument("--allow-stale-map", action="store_true",
                         help="Skip the CV mtime check (use only when you know the map is current)")
     args = parser.parse_args()
@@ -144,7 +154,7 @@ def main():
         with zipfile.ZipFile(args.cv) as zf:
             xml_text = zf.read(story["file"]).decode("utf-8")
         try:
-            new_xml, changes = apply_edits_to_story(xml_text, story_edits, story, args.budget_pct)
+            new_xml, changes = apply_edits_to_story(xml_text, story_edits, story, args.budget_pct, args.min_fraction)
         except ValueError as e:
             print(f"Edit rejected: {e}", file=sys.stderr)
             sys.exit(1)

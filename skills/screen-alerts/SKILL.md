@@ -254,12 +254,18 @@ submit anything.
    (e.g. budget/team management) reword the least-relevant existing bullet
    into it. Use the story map's run texts to pick which bullets to edit.
 
+   Removal is allowed and encouraged where it sharpens the fit: in the
+   methods/tools line and the core strengths line (both comma/bullet lists),
+   drop items that are irrelevant to the role rather than only reordering
+   them. Shrinking a line is layout-safe (it just leaves white space), so the
+   tool permits a run to drop to 40% of its original length; only growth is
+   capped (overset risk).
+
    Content rules: every claim traces to the master CV or career brief;
    British or American spelling follows the posting; tone matches the master
-   CV; no em dashes. Framing lines stay within ±`cv_length_budget_pct`%
-   (default 10); experience bullets may use up to ±15% (pass
-   `--budget-pct 15`), since a few words of the ad's vocabulary need the room
-   and the section's total length stays roughly constant.
+   CV; no em dashes. Growth budget: framing lines +`cv_length_budget_pct`%
+   (default 10); experience bullets up to +20% (pass `--budget-pct 20`),
+   since the ad's vocabulary sometimes needs the room.
 3. Apply: `python3 scripts/idml-apply.py --cv <master_cv_path> --map <story_map_path> --edits <edits.json> --out <cv_drafts_dir>/CV-rabourn-<company-slug>-<YYYY-MM-DD>.idml`
    The script enforces the whitelist, length budget, XML well-formedness,
    and IDML packaging rules; treat its failure as a per-job failure, note it
