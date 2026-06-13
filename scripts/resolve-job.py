@@ -32,7 +32,54 @@ import os
 import re
 import subprocess
 import sys
+import urllib.request
 from difflib import SequenceMatcher
+from html.parser import HTMLParser
+from io import StringIO
+
+WORKDAY_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+
+
+class _Stripper(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.out = StringIO()
+
+    def handle_data(self, data):
+        self.out.write(data)
+
+
+def strip_html(s):
+    p = _Stripper()
+    try:
+        p.feed(s or "")
+    except Exception:
+        return s or ""
+    return " ".join(p.out.getvalue().split())
+
+
+def fetch_workday_description(external_url):
+    """Fetch a Workday job's full description from its CXS detail endpoint.
+
+    Transforms the public job URL
+      https://{tenant}.{wd}.myworkdayjobs.com/en-US/{site}{path}
+    into the API detail URL
+      https://{tenant}.{wd}.myworkdayjobs.com/wday/cxs/{tenant}/{site}{path}
+    and returns the plain-text jobDescription, or "" on any failure.
+    """
+    if not external_url or "/en-US/" not in external_url or "myworkdayjobs.com" not in external_url:
+        return ""
+    try:
+        host_part, rest = external_url.split("/en-US/", 1)
+        tenant = host_part.split("//", 1)[1].split(".", 1)[0]
+        detail_url = f"{host_part}/wday/cxs/{tenant}/{rest}"
+        req = urllib.request.Request(detail_url, headers={"User-Agent": WORKDAY_UA, "Accept": "application/json"})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        return strip_html(data.get("jobPostingInfo", {}).get("jobDescription", ""))
+    except Exception as e:
+        print(f"WORKDAY DETAIL FAILED {external_url[:60]} ({type(e).__name__})", file=sys.stderr)
+        return ""
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS = os.path.join(ROOT, "scripts")
@@ -85,10 +132,15 @@ def fetch_board(ats, slug, cache):
     key = (ats, slug)
     if key in cache:
         return cache[key]
+    # Greenhouse omits job descriptions unless ?content=true; without this the
+    # scorer only sees titles. One call returns full content for every posting.
+    scan_args = [os.path.join(SCRIPTS, f"scan-{ats}.sh"), slug]
+    if ats == "greenhouse":
+        scan_args.append("--content")
     try:
         scan = subprocess.run(
-            [os.path.join(SCRIPTS, f"scan-{ats}.sh"), slug],
-            capture_output=True, text=True, timeout=30,
+            scan_args,
+            capture_output=True, text=True, timeout=45,
         )
     except (subprocess.TimeoutExpired, OSError) as e:
         # A hung or failing probe means "no usable board", never a crashed run.
@@ -232,7 +284,20 @@ def resolve(job, known, cache, log):
         if best.get("work_mode") and job.get("work_mode") in ("", "unknown"):
             job["work_mode"] = best["work_mode"]
             job["remote"] = best["work_mode"] == "remote"
-        log(f"RESOLVED {company} / {title} -> {best_meta[0]}:{best_meta[1]} (match {best_score:.2f})")
+        # Workday's search endpoint omits descriptions; fetch the matched
+        # job's detail so scoring sees the full ad, not just the title.
+        if best_meta[0] == "workday" and len(job.get("description_text") or "") < 200:
+            detail = fetch_workday_description(best.get("url", ""))
+            if detail:
+                job["description_text"] = detail
+        # Greenhouse returns HTML-escaped content, so one strip leaves literal
+        # tags; re-strip when residual markup remains.
+        desc = job.get("description_text") or ""
+        if re.search(r"<[a-zA-Z/]", desc):
+            job["description_text"] = strip_html(desc)
+        if len(job.get("description_text") or "") < 200:
+            job["thin_description"] = True  # scorer should flag, not invent
+        log(f"RESOLVED {company} / {title} -> {best_meta[0]}:{best_meta[1]} (match {best_score:.2f}, desc {len(job.get('description_text') or '')} chars)")
     else:
         job["source_type"] = "unverified"
         job.setdefault("canonical_url", "")

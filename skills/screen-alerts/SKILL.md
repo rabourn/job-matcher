@@ -139,6 +139,16 @@ skills 0-30, seniority 0-20, sector 0-20, work mode 0-15, culture/values
 0-10, recency 0-5. Tiers: 80-100 Tier 1 (strong), 60-79 Tier 2 (good),
 40-59 Tier 3 (growth).
 
+**Score on the full job description, not the title.** Each resolved job
+carries `description_text` (the resolver fetches the complete ad: Greenhouse
+via content=true, Workday via its detail endpoint, Ashby/Lever/Workable from
+the listing). Read it and score skills, sector, culture, and the
+product-mandate guard against what the ad actually says. A job flagged
+`thin_description: true` (under 200 characters resolved) could not have its
+full ad fetched: score it conservatively on title and metadata, and say so
+in the report ("scored on title only, full ad not retrievable"). Do not let a
+thin description silently depress a verified role without noting why.
+
 Apply, in this order:
 
 1. **Private overrides first**: exclusions from `brief_overrides_path` are
