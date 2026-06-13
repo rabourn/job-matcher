@@ -51,7 +51,7 @@ ROLE_RULES = [
     ("core_strengths", True, lambda t: t.upper().startswith("CORE STRENGTHS")),
     ("experience", True, lambda t: t.upper().startswith("EXPERIENCE")),
     ("methods", True, lambda t: t.upper().startswith(("METHODS, TOOLS", "METHODS & TOOLS", "METHODS AND TOOLS"))),
-    ("earlier_career", False, lambda t: t.upper().startswith("EARLIER CAREER")),
+    ("earlier_career", True, lambda t: t.upper().startswith("EARLIER CAREER")),
     ("letter", True, lambda t: t.upper().startswith(("DEAR", "COVER LETTER", "TO THE HIRING"))),
     ("education", False, lambda t: t.upper().startswith("EDUCATION") or "DISSERTATION" in t.upper()[:120] or t.upper().startswith("PHD")),
     ("languages", False, lambda t: t.upper().startswith("LANGUAGES")),
