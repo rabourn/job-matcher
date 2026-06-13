@@ -116,8 +116,9 @@ turn, never background a command: run everything synchronously (rule 8).
    `scripts/verify-url.sh <url>`: VERIFIED -> source_type "web";
    EXPIRED -> mark skipped with reason; otherwise source_type stays
    "unverified".
-4. Manual evidence folder: read any PDFs in `data/job-ads/` not yet prefixed
-   `.processed-`. For each, extract company, title, work mode, posted date,
+4. Manual evidence folder (done in the SCORE phase, since reading PDFs needs
+   the model): read any PDFs directly in `data/job-ads/` (ignore the
+   `processed/` subfolder). For each, extract company, title, work mode, posted date,
    and description from the ad, then match to a ledger row (same fuzzy
    company+title spirit as resolve-job.py; check both this batch and
    existing rows via `ledger.py check`). On a match: treat the ad as the
@@ -127,8 +128,7 @@ turn, never background a command: run everything synchronously (rule 8).
    evidence job skips the unverified penalty, but it is still labeled
    "manual evidence (user-supplied ad)" in the report with the citation.
    If a PDF matches no known job, score it as a new lead anyway and note
-   where it came from. After processing, rename the file with a
-   `.processed-` prefix.
+   where it came from. After processing, move the file into `data/job-ads/processed/`.
 
    Precedence when the matched job already has a disposition (a duplicate
    drop is a user mistake to absorb, not an override):
@@ -143,7 +143,7 @@ turn, never background a command: run everything synchronously (rule 8).
      the only path back from skipped.
    - Status reported but unverified: the intended case; upgrade to manual
      evidence and re-score.
-   In every case the PDF is renamed `.processed-` so it is consumed once.
+   In every case the PDF is moved to `data/job-ads/processed/` so it is consumed once.
 5. Freshness rule: jobs whose canonical posted_date is older than
    `freshness_days` are skipped with reason "stale (posted <date>)".
    Jobs with no canonical date stay unverified: labeled, ranked below
