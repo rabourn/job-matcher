@@ -149,19 +149,34 @@ Apply, in this order:
    factory cultures, IC-only roles without ownership, innovation theater,
    pure research without product mandate, sales/quota roles, deep
    engineering build roles, PMO/reporting roles.
-3. **Standing location rules**:
+3. **Citizenship eligibility (hard skip, score 0)**: the user is a US
+   citizen, not a Gulf-state national. Skip any role restricted to nationals
+   of a country she does not hold, with reason "ineligible: <restriction>".
+   Catch title and description signals such as "Emirati only", "UAE Nationals
+   only", "Emiratization", "Saudi Nationals only", "Saudization", "GCC
+   nationals only", "Qatari/Bahraini nationals only", "open to nationals
+   only", "reserved for citizens". This is an eligibility bar no visa
+   sponsorship overcomes, and it is separate from (and overrides) the Gulf
+   in-office preference. Note: a role about *researching or supporting*
+   nationalization (e.g. the user's own past Emiratization design work) is
+   NOT restricted; only skip roles that restrict the *applicant's*
+   nationality. For unverified roles, only the title is visible, so a
+   restriction stated only in the body cannot be caught until the role is
+   verified; do not assume a Gulf role is open just because the title is
+   silent.
+4. **Standing location rules**:
    - Dubai/UAE roles: assume visa sponsorship unless the posting says
      otherwise; do not penalize missing visa language.
    - US remote roles: viable (US citizen). "Must reside in US" plus remote
      is viable.
    - Singapore: acceptable, no penalty.
-4. **Product-mandate guard** (the keyword-bait check): if a role scores high
+5. **Product-mandate guard** (the keyword-bait check): if a role scores high
    mostly on methods keywords (foresight, workshops, storytelling, design
    thinking, HCD), check what the role produces and who owns the output. If
    outputs are reports feeding someone else's plan, with no build or ship
    mandate, cap the score at 59 (Tier 3) and record the reason. Methods
    vocabulary reliably over-attracts; this guard exists because of it.
-5. **Unverified penalty**: unverified jobs get recency 0 and are listed in a
+6. **Unverified penalty**: unverified jobs get recency 0 and are listed in a
    separate, clearly labeled section, after verified jobs, regardless of score.
 
 For every scored job, update the ledger:
