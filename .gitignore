@@ -41,3 +41,6 @@ data/job-ads/*
 # Pipeline run temp dirs
 data/.pipeline-*
 data/.run-tmp-*
+
+# Applications scan temp records
+data/.applications-*.json
