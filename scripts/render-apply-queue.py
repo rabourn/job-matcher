@@ -51,7 +51,8 @@ def main():
     conn = sqlite3.connect(args.ledger)
     conn.row_factory = sqlite3.Row
     rows = conn.execute(
-        "SELECT company, title, score, canonical_url, posted_date, source_type, cv_path, report_path "
+        "SELECT company, title, score, location, work_mode, canonical_url, posted_date, "
+        "source_type, cv_path, report_path "
         "FROM jobs WHERE status='reported' AND tier=? ORDER BY score DESC",
         (args.tier,),
     ).fetchall()
@@ -71,6 +72,11 @@ def main():
             out.append(f"## {r['title']}: {r['company']}")
             out.append("")
             out.append(f"- Score: {r['score']} (Tier 1)")
+            loc, wm = r["location"] or "", r["work_mode"] or ""
+            if loc and wm and wm.lower() not in loc.lower():
+                out.append(f"- Location: {loc} ({wm})")
+            elif loc or wm:
+                out.append(f"- Location: {loc or wm}")
             out.append(f"- Posted: {posted} · verified via {r['source_type'] or 'unknown'}")
             if r["canonical_url"]:
                 out.append(f"- Apply: {r['canonical_url']}")

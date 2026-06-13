@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     company TEXT NOT NULL,
     title TEXT NOT NULL,
     location TEXT DEFAULT '',
+    work_mode TEXT DEFAULT '',
     status TEXT NOT NULL DEFAULT 'new',
     first_seen TEXT NOT NULL,
     last_seen TEXT NOT NULL,
@@ -112,6 +113,11 @@ def connect(db_path):
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     conn.executescript(SCHEMA)
+    # Migration: add columns introduced after a db was first created.
+    cols = {r[1] for r in conn.execute("PRAGMA table_info(jobs)")}
+    if "work_mode" not in cols:
+        conn.execute("ALTER TABLE jobs ADD COLUMN work_mode TEXT DEFAULT ''")
+        conn.commit()
     return conn
 
 
@@ -200,6 +206,12 @@ def cmd_set_status(args):
     if args.posted_date:
         sets += ", posted_date = :posted_date"
         fields["posted_date"] = args.posted_date
+    if args.work_mode:
+        sets += ", work_mode = :work_mode"
+        fields["work_mode"] = args.work_mode
+    if args.location:
+        sets += ", location = :location"
+        fields["location"] = args.location
     fields["key"] = args.key
     cur = conn.execute(f"UPDATE jobs SET {sets} WHERE key = :key", fields)
     conn.commit()
@@ -281,6 +293,8 @@ def main():
     p_status.add_argument("--canonical-url", dest="canonical_url", default="")
     p_status.add_argument("--source-type", dest="source_type", default="")
     p_status.add_argument("--posted-date", dest="posted_date", default="")
+    p_status.add_argument("--work-mode", dest="work_mode", default="")
+    p_status.add_argument("--location", dest="location", default="")
 
     p_queue = sub.add_parser("queue", help="List jobs by status (JSON to stdout)")
     p_queue.add_argument("--status", default="reported")

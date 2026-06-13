@@ -208,7 +208,8 @@ Apply, in this order:
    separate, clearly labeled section, after verified jobs, regardless of score.
 
 For every scored job, update the ledger:
-`python3 scripts/ledger.py set-status --key <ledger_key> --status reported --score N --tier N --canonical-url URL --source-type TYPE --posted-date DATE`
+`python3 scripts/ledger.py set-status --key <ledger_key> --status reported --score N --tier N --canonical-url URL --source-type TYPE --posted-date DATE --location "<city/country>" --work-mode <remote|hybrid|onsite>`
+(location and work-mode come from the resolved job; they surface in the apply queue.)
 (or `--status skipped --note "<reason>"` for dealbreakers/stale).
 
 ## Phase 5: Report and vault delivery
