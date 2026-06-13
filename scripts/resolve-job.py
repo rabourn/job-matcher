@@ -87,6 +87,11 @@ SCRIPTS = os.path.join(ROOT, "scripts")
 ATS_ORDER = ["greenhouse", "lever", "ashby", "workable"]
 TITLE_MATCH_THRESHOLD = 0.75
 
+# Job-board aggregators that host other companies' postings on their own ATS.
+# A title match on these boards is not canonical employer verification (the
+# real employer and ATS are elsewhere), so never treat them as resolved.
+AGGREGATOR_SLUGS = {"jobgether", "remoteok", "weworkremotely", "remotive", "workatastartup"}
+
 # Suffixes that appear in alert-email company names but rarely in ATS slugs.
 COMPANY_NOISE = re.compile(
     r"\b(middle east|mena|emea|apac|uk|usa|global|group|inc|llc|ltd|gmbh|corp|corporation|limited)\b",
@@ -262,6 +267,11 @@ def resolve(job, known, cache, log):
                     best, best_score, best_meta = posting, score, ("workday", slug)
             if best_score >= TITLE_MATCH_THRESHOLD:
                 break
+
+    # An aggregator board match is not canonical employer verification.
+    if best_meta and best_meta[1] in AGGREGATOR_SLUGS:
+        log(f"AGGREGATOR {company} / {title} matched {best_meta[1]} board; not canonical, left unverified")
+        best = None
 
     if best and best_score >= TITLE_MATCH_THRESHOLD:
         job["canonical_url"] = best.get("url", "")
