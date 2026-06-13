@@ -237,31 +237,42 @@ submit anything.
 1. Read the story map (`story_map_path`) and the master CV. Editable stories
    and their roles come from the map; never touch stories outside the
    whitelist.
-2. For each Tier 1 role, draft replacement text for: profile paragraph, core
-   strengths line, methods and tools line, AND the most role-relevant
-   experience bullets. The page 3 letter story gets the v1 placeholder note,
-   not a tailored letter.
+2. **Edit for the role's vibe, not just keywords.** Before writing anything,
+   read the full ad and write yourself a short register map: its vocabulary
+   (the actual nouns it uses for people, work, and outcomes), its themes,
+   what it values, its tone. A museum's register is audience, visitors,
+   cultural sensitivity, public engagement, accessibility; a fintech's is
+   customers, risk, compliance, scale. Then rewrite the candidate's TRUE
+   experience to speak in that register. Tailoring is editorial, not literal:
+   the timid failure mode (observed 2026-06-13) is hugging the master CV's
+   wording and changing almost nothing.
 
-   The experience bullets are the point, not an afterthought. Editing only
-   the three framing lines makes every CV nearly identical (observed
-   2026-06-13). Read the full job ad, then rewrite 4-6 of the master CV's
-   experience bullets so they say the SAME true thing in the AD'S vocabulary:
-   mirror its key terms (e.g. for a museum role: "digital literacy",
-   "audience", "evidence-based recommendations"; for fintech: "payments",
-   "risk", "compliance"). Reword and reorder emphasis only; never invent
-   experience the master CV does not support. idml-apply.py replaces existing
-   runs but cannot add new bullets, so to surface a role-critical theme
-   (e.g. budget/team management) reword the least-relevant existing bullet
-   into it. Use the story map's run texts to pick which bullets to edit.
+   Concretely, across profile, core strengths, methods/tools, AND the most
+   role-relevant experience bullets (the page 3 letter gets the v1
+   placeholder, not a tailored letter), do all of:
+   - **Swap terminology** to the role's register ("customer" -> "audience"
+     or "visitor" for a cultural role).
+   - **Add true keywords the ad asks for**, even if the master CV omits the
+     exact words. The bar is TRUTH, not "verbatim in the master CV": if the
+     candidate genuinely does the thing (per the brief, the master CV's
+     implications, or confirmed by the user), name it in the ad's words
+     (e.g. data visualization, Google Analytics, emerging-technology
+     research, digital accessibility, content standards). Never claim
+     experience the candidate does not have.
+   - **Drop irrelevant items.** Cut strengths and methods/tools the role
+     does not care about ("Zero-to-One Product Strategy" on a heritage role,
+     dev tools like Jira/Confluence on a non-engineering role) rather than
+     only reordering. Shrinking is layout-safe (just white space); the tool
+     allows a run down to 40% of its original length.
+   - **Rewrite 4-6 experience bullets** to say the same true thing in the
+     ad's vocabulary, and reorder to lead with the most relevant. idml-apply
+     replaces existing runs but cannot ADD a bullet, so to surface a
+     role-critical theme (e.g. budget/team management) reword the
+     least-relevant existing bullet into it.
 
-   Removal is allowed and encouraged where it sharpens the fit: in the
-   methods/tools line and the core strengths line (both comma/bullet lists),
-   drop items that are irrelevant to the role rather than only reordering
-   them. Shrinking a line is layout-safe (it just leaves white space), so the
-   tool permits a run to drop to 40% of its original length; only growth is
-   capped (overset risk).
-
-   Content rules: every claim traces to the master CV or career brief;
+   Content rules: every claim is TRUE (traceable to the master CV, the career
+   brief, or the candidate's confirmed experience), expressed in the role's
+   language;
    British or American spelling follows the posting; tone matches the master
    CV; no em dashes. Growth budget: framing lines +`cv_length_budget_pct`%
    (default 10); experience bullets up to +20% (pass `--budget-pct 20`),
