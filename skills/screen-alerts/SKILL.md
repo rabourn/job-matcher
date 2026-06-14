@@ -290,7 +290,21 @@ submit anything.
    in the report, and continue with other jobs.
 4. Write a plain text diff summary next to each draft (same name, .changes.txt):
    what changed, why, and a reminder to check for overset text in InDesign.
-5. Update the ledger with `--cv-path` and add the draft to the apply queue
+5. Write a job-ad companion file next to each draft, named
+   `CV-rabourn-<company-slug>-<date>.job-ad.md`, with TWO clearly separated,
+   clearly labelled parts:
+   - **"## Matched keywords (pipeline analysis)"** that YOU write: the terms
+     from the ad that map to Tanya's real skills/experience, each as
+     `"<ad term>" -> <where it is true in her background>` (drawing on the
+     brief, master CV, and experience bank). Follow it with a short
+     **"### Not claimed / gaps"** list of notable ad requirements she does
+     not meet, so the picture is honest.
+   - **"## Job ad (verbatim)"** containing the captured ad text exactly as
+     received (description_text, or the manual-evidence PDF text), with its
+     source URL/file and capture date. Do not edit or summarize this part.
+   A horizontal rule and the headers must make it obvious which part is the
+   pipeline's analysis and which is the untouched ad.
+6. Update the ledger with `--cv-path` and add the draft to the apply queue
    entry.
 
 ## Phase 7: Run log
